@@ -1,0 +1,21 @@
+{
+    "compileOnSave": true,
+    "compilerOptions": {
+        "newLine": "LF",
+        "allowJs": true,
+        "target": "ESNext",
+        "module": "NodeNext",
+        "alwaysStrict": true,
+        "esModuleInterop": true,
+        "preserveConstEnums": true,
+        "moduleResolution": "NodeNext",
+    },
+    "include": [
+        "api/**/*.ts",
+        "utils/**/*.ts",
+        "scripts/**/*.ts"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}

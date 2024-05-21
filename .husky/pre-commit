@@ -1,0 +1,3 @@
+pnpm exec tsc --noEmit
+pnpm run --silent lint
+git add -u

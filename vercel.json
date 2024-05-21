@@ -1,0 +1,15 @@
+{
+    "github": {
+        "silent": true
+    },
+    "routes": [
+        {
+            "src": "/(?<id>[^/]*)",
+            "dest": "/api?id=$id"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/api/404"
+        }
+    ]
+}
