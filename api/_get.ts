@@ -56,8 +56,8 @@ async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // fire the required Mixpanel events
-    mixpanel.track.setProfile({ id: member.id, name: member.name, phone: member.phone })
-    mixpanel.track.linkedInClicked({
+    await mixpanel.track.setProfile({ id: member.id, name: member.name, phone: member.phone })
+    await mixpanel.track.linkedInClicked({
         pathName: id,
         id: member.id,
         target: member.linkedin,

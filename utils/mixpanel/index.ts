@@ -16,8 +16,6 @@ export function getMixpanel() {
 
     console.log('Creating Mixpanel client')
     mp = Mixpanel.init(token, {
-        debug: true,
-        verbose: true,
         keepAlive: true,
     })
 

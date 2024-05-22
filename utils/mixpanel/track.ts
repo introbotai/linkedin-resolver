@@ -5,26 +5,44 @@
 
 import { getMixpanel } from './index.js'
 
-export function setProfile({ id, name, phone }: { id: string, name?: string, phone: string }) {
-    const payload = {
-        $phone: phone
-    }
+interface SetProfile { id: string, name?: string, phone: string }
 
-    if (name) {
-        payload['$name'] = name
-    }
-
-    // send to Mixpanel event
-    const mp = getMixpanel()
-    mp.people.set(id, payload)
+export function setProfile({ id, name, phone }: SetProfile): Promise<void> {
+    return new Promise((resolve, reject) => {
+        const payload = {
+            $phone: phone
+        }
+    
+        if (name) {
+            payload['$name'] = name
+        }
+    
+        // send to Mixpanel event
+        const mp = getMixpanel()
+        mp.people.set(id, payload, (err) => {
+            if (err) return reject(err)
+            resolve()
+        })
+    })
 }
 
-export function linkedInClicked({ id, target, pathName }: { id: string, pathName: string, target: string }) {
-    const mp = getMixpanel()
+interface LinkedInClicked { id: string, pathName: string, target: string }
+
+export function linkedInClicked({ id, target, pathName }: LinkedInClicked): Promise<void> {
+    return new Promise((resolve, reject) => {
+        const mp = getMixpanel()
     
-    mp.track('LinkedIn Clicked', {
-        Target: target,
-        distinct_id: id,
-        PathName: pathName,
+        mp.track(
+            'LinkedIn Clicked',
+            {
+                Target: target,
+                distinct_id: id,
+                PathName: pathName,
+            },
+            (err) => {
+                if (err) return reject(err)
+                resolve()
+            }
+        )
     })
 }
