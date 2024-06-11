@@ -63,7 +63,11 @@ async function handler(req: VercelRequest, res: VercelResponse) {
         target: member.linkedin,
     })
 
-    const target = `https://${member.linkedin}`
+    // url encode the username because people have weird characters
+    // in their usernames 🙄
+    const linkedinUsername = encodeURIComponent(member.linkedin.split('/').pop())
+    const hostname = member.linkedin.split('/').toSpliced(-1, 1)
+    const target = `https://${hostname.join('/')}/${linkedinUsername}`
     res.setHeader('Location', target)
 
     console.log(`Redirecting to: ${target}`)
