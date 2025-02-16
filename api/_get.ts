@@ -10,7 +10,7 @@ import { db } from '../utils/db.js'
 import * as mixpanel from '../utils/mixpanel/index.js'
 
 const querySchema = z.object({
-    id: z.string()
+    id: z.string(),
 }).strict()
 
 async function handler(req: VercelRequest, res: VercelResponse) {
@@ -41,8 +41,8 @@ async function handler(req: VercelRequest, res: VercelResponse) {
             name: {
                 startsWith: name,
                 mode: 'insensitive',
-            }
-        }
+            },
+        },
     })
 
     if (!member) {
@@ -78,5 +78,5 @@ export const get: RouteConfig = {
     handler,
     validation: {
         query: querySchema,
-    }
+    },
 }

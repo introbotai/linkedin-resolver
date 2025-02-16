@@ -10,7 +10,7 @@ interface SetProfile { id: string, name?: string, phone: string }
 export function setProfile({ id, name, phone }: SetProfile): Promise<void> {
     return new Promise((resolve, reject) => {
         const payload = {
-            $phone: phone
+            $phone: phone,
         }
     
         if (name) {

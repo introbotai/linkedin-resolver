@@ -11,5 +11,5 @@ export default func({
     cors,
     methods: {
         get,
-    }
+    },
 })
