@@ -7,13 +7,6 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model alembic_version {
-    version_num String? @db.VarChar(32)
-
-    @@ignore
-}
-
 model answer {
     id             String       @id @db.VarChar(36)
     interaction_id String?      @db.VarChar(36)
@@ -26,27 +19,29 @@ model answer {
 }
 
 model broadcast {
-    id                String              @id(map: "pk_broadcast") @db.VarChar(6)
-    created           DateTime            @default(now()) @db.Timestamp(6)
-    updated           DateTime            @default(now()) @db.Timestamp(6)
-    status            String              @default("ongoing") @db.VarChar(16)
-    template          String?             @db.VarChar(128)
-    content           String              @default("[]") @db.VarChar(1024)
-    links             String              @default("[]") @db.VarChar(2014)
-    identifiers       String              @default("[]") @db.VarChar(1024)
-    state             String?             @db.VarChar(128)
-    staff_username    String?             @db.VarChar(25)
-    label_id          String              @default("BSPzUv") @db.VarChar(6)
-    admin_username    String?             @db.VarChar(16)
-    phones            String              @default("[]")
-    send_at           DateTime?           @db.Timestamp(6)
-    media_info        String              @default("[]") @db.VarChar(1024)
-    button_values     String              @default("{}") @db.VarChar(1024)
-    cluster_admin     cluster_admin?      @relation(fields: [admin_username], references: [phone], onDelete: NoAction, onUpdate: NoAction, map: "fk_broadcast_admin_username_cluster_admin")
-    label             label               @relation(fields: [label_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_broadcast_label_id_label")
-    staff             staff?              @relation(fields: [staff_username], references: [username], onDelete: NoAction, onUpdate: NoAction, map: "fk_broadcast_staff_username_staff")
-    broadcast_message broadcast_message[]
-    interaction       interaction[]
+    id                       String                     @id(map: "pk_broadcast") @db.VarChar(6)
+    created                  DateTime                   @default(now()) @db.Timestamp(6)
+    updated                  DateTime                   @default(now()) @db.Timestamp(6)
+    status                   String                     @default("ongoing") @db.VarChar(16)
+    template                 String?                    @db.VarChar(128)
+    content                  String                     @default("[]") @db.VarChar(1024)
+    links                    String                     @default("[]") @db.VarChar(2014)
+    identifiers              String                     @default("[]") @db.VarChar(1024)
+    state                    String?                    @db.VarChar(128)
+    staff_username           String?                    @db.VarChar(25)
+    label_id                 String                     @default("BSPzUv") @db.VarChar(6)
+    admin_username           String?                    @db.VarChar(16)
+    phones                   String                     @default("[]")
+    send_at                  DateTime?                  @db.Timestamp(6)
+    media_info               String                     @default("[]") @db.VarChar(1024)
+    button_values            String                     @default("{}") @db.VarChar(1024)
+    cluster_admin            cluster_admin?             @relation(fields: [admin_username], references: [phone], onDelete: NoAction, onUpdate: NoAction, map: "fk_broadcast_admin_username_cluster_admin")
+    label                    label                      @relation(fields: [label_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_broadcast_label_id_label")
+    staff                    Staff?                     @relation(fields: [staff_username], references: [username], onDelete: NoAction, onUpdate: NoAction, map: "fk_broadcast_staff_username_staff")
+    broadcast_deployment_map broadcast_deployment_map[]
+    broadcast_message        broadcast_message[]
+    interaction              interaction[]
+    survey                   survey[]
 }
 
 model broadcast_message {
@@ -77,24 +72,26 @@ model ca_deployment_map {
     admin_id      String        @db.VarChar(6)
     deployment_id String        @db.VarChar(6)
     created       DateTime      @default(now()) @db.Timestamp(6)
-    updated       DateTime      @default(now()) @db.Timestamp(6)
     cluster_admin cluster_admin @relation(fields: [admin_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_ca_deployment_map_admin_id_cluster_admin")
     deployment    deployment    @relation(fields: [deployment_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_ca_deployment_map_deployment_id_deployment")
 }
 
 model cluster {
-    id                                                     String                   @id(map: "pk_cluster") @db.VarChar(36)
-    name                                                   String                   @unique(map: "ix_cluster_name") @db.VarChar(128)
-    score                                                  String                   @db.VarChar(16)
-    label_id                                               String                   @db.VarChar(6)
-    access                                                 String                   @db.VarChar(128)
-    created                                                DateTime                 @default(now()) @db.Timestamp(6)
-    updated                                                DateTime                 @default(now()) @db.Timestamp(6)
-    label                                                  label                    @relation(fields: [label_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_cluster_label_id_label")
-    cluster_access_cluster_access_from_cluster_idTocluster cluster_access[]         @relation("cluster_access_from_cluster_idTocluster")
-    cluster_access_cluster_access_to_cluster_idTocluster   cluster_access[]         @relation("cluster_access_to_cluster_idTocluster")
+    id                                                     String                    @id(map: "pk_cluster") @db.VarChar(36)
+    name                                                   String                    @unique(map: "ix_cluster_name") @db.VarChar(128)
+    score                                                  String                    @db.VarChar(16)
+    label_id                                               String                    @db.VarChar(6)
+    access                                                 String                    @db.VarChar(128)
+    created                                                DateTime                  @default(now()) @db.Timestamp(6)
+    updated                                                DateTime                  @default(now()) @db.Timestamp(6)
+    ClusterMemberMap                                       ClusterMemberMap[]
+    Keyword                                                Keyword[]
+    label                                                  label                     @relation(fields: [label_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_cluster_label_id_label")
+    cluster_access_cluster_access_from_cluster_idTocluster cluster_access[]          @relation("cluster_access_from_cluster_idTocluster")
+    cluster_access_cluster_access_to_cluster_idTocluster   cluster_access[]          @relation("cluster_access_to_cluster_idTocluster")
     cluster_deployment_map                                 cluster_deployment_map[]
-    cluster_member_map                                     cluster_member_map[]
+    journey_segment_cluster                                journey_segment_cluster[]
+    raw_data_info                                          raw_data_info[]
 }
 
 model cluster_access {
@@ -118,8 +115,11 @@ model cluster_admin {
     event_key                 String?             @db.VarChar(1024)
     api_key                   String?             @db.VarChar(1024)
     broadcast                 broadcast[]
+    broadcast_text            broadcast_text[]
     ca_cluster_map            ca_cluster_map[]
     ca_deployment_map         ca_deployment_map[]
+    notification              notification[]
+    raw_data_info             raw_data_info[]
 }
 
 model cluster_deployment_map {
@@ -129,17 +129,6 @@ model cluster_deployment_map {
     created       DateTime   @default(now()) @db.Timestamp(6)
     cluster       cluster    @relation(fields: [cluster_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_cluster_deployment_map_cluster_id_cluster")
     deployment    deployment @relation(fields: [deployment_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_cluster_deployment_map_deployment_id_deployment")
-}
-
-model cluster_member_map {
-    id             String      @id(map: "pk_cluster_member_map") @db.VarChar(36)
-    cluster_id     String      @db.VarChar(36)
-    person_id      String      @db.VarChar(36)
-    interaction_id String      @db.VarChar(36)
-    created        DateTime    @default(now()) @db.Timestamp(6)
-    cluster        cluster     @relation(fields: [cluster_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_cluster_member_map_cluster_id_cluster")
-    interaction    interaction @relation(fields: [interaction_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_cluster_member_map_interaction_id_interaction")
-    person         person      @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_cluster_member_map_person_id_person")
 }
 
 model connection {
@@ -166,42 +155,52 @@ model credentials {
     updated       DateTime @default(now()) @db.Timestamp(6)
 }
 
-model d2c_registered {
-    phone String @id(map: "pk_d2c_registered") @db.VarChar(12)
-}
-
 model deployment {
-    id                     String                   @id(map: "pk_deployment") @db.VarChar(6)
-    name                   String                   @unique(map: "uq_deployment_name") @db.VarChar(255)
-    config                 String
-    is_enabled             Boolean
-    created                DateTime                 @default(now()) @db.Timestamp(6)
-    updated                DateTime                 @default(now()) @db.Timestamp(6)
-    title                  String                   @default("New Event") @db.VarChar(255)
-    ca_deployment_map      ca_deployment_map[]
-    cluster_deployment_map cluster_deployment_map[]
+    id                       String                     @id(map: "pk_deployment") @db.VarChar(6)
+    name                     String                     @unique(map: "uq_deployment_name") @db.VarChar(255)
+    config                   String
+    is_enabled               Boolean
+    created                  DateTime                   @default(now()) @db.Timestamp(6)
+    updated                  DateTime                   @default(now()) @db.Timestamp(6)
+    title                    String                     @default("New Event") @db.VarChar(255)
+    send_all_count           Int                        @default(0)
+    send_all_limit           Int                        @default(3)
+    themeColor               String                     @default("000000") @db.VarChar(10)
+    apiKey                   String                     @db.VarChar(32)
+    DeploymentConcierge      DeploymentConcierge[]
+    DeploymentDate           DeploymentDate[]
+    LabelDeploymentMap       LabelDeploymentMap[]
+    broadcast_deployment_map broadcast_deployment_map[]
+    ca_deployment_map        ca_deployment_map[]
+    cluster_deployment_map   cluster_deployment_map[]
 }
 
 model event {
-    id                   String      @id(map: "pk_event") @db.VarChar(36)
-    name                 String      @db.VarChar(64)
-    created              DateTime    @default(now()) @db.Timestamp(6)
-    updated              DateTime    @default(now()) @db.Timestamp(6)
-    cluster_id           String      @unique(map: "uq_event_cluster_id") @db.VarChar(36)
-    menu_id              String?     @db.VarChar(36)
-    reco_limit           Int         @default(10)
-    keywords             String      @default("[]") @db.VarChar(1024)
-    regret_msg           String?     @db.VarChar(1024)
-    show_micro_dashboard Boolean     @default(true)
-    show_bot_feedback    Boolean     @default(true)
-    send_notifications   Boolean     @default(false)
-    notify_in            Int         @default(24)
-    connection_limit     Int         @default(100)
-    token                token       @relation(fields: [cluster_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_event_cluster_id_token")
-    event_menu           event_menu? @relation(fields: [menu_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_event_menu_id_event_menu")
-    flow_copy            flow_copy[]
+    id                       String         @id(map: "pk_event") @db.VarChar(36)
+    name                     String         @db.VarChar(64)
+    created                  DateTime       @default(now()) @db.Timestamp(6)
+    updated                  DateTime       @default(now()) @db.Timestamp(6)
+    cluster_id               String         @unique(map: "uq_event_cluster_id") @db.VarChar(36)
+    menu_id                  String?        @db.VarChar(36)
+    reco_limit               Int            @default(10)
+    keywords                 String         @default("[]") @db.VarChar(1024)
+    regret_msg               String?        @db.VarChar(1024)
+    show_micro_dashboard     Boolean        @default(true)
+    show_bot_feedback        Boolean        @default(true)
+    connection_limit         Int            @default(100)
+    demographics_fields      String         @default("[]") @db.VarChar(1024)
+    inactive_recommendations Boolean        @default(true)
+    active_cluster_fencing   Boolean        @default(false)
+    flow_name                String?        @db.VarChar(128)
+    enable_bio_updation      Boolean        @default(true)
+    accuracy                 Int            @default(50)
+    token                    token          @relation(fields: [cluster_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_event_cluster_id_token")
+    event_menu               event_menu?    @relation(fields: [menu_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_event_menu_id_event_menu")
+    flow_copy                flow_copy[]
+    flow_synonym             flow_synonym[]
 
     @@index([name], map: "ix_event_name")
+    @@index([flow_name], map: "ix_event_flow_name")
 }
 
 model event_menu {
@@ -241,28 +240,29 @@ model information {
 }
 
 model interaction {
-    id                 String               @id @db.VarChar(36)
-    whatsapp_id        String?              @unique(map: "ix_interaction_whatsapp_id") @db.VarChar(128)
-    person_id          String               @db.VarChar(36)
-    thread_id          String?              @db.VarChar(36)
-    text               String               @db.VarChar(1024)
-    status             String               @db.VarChar(128)
-    category           String?              @db.VarChar(128)
-    type               String?              @db.VarChar(128)
-    created            DateTime             @default(now()) @db.Timestamp(6)
-    updated            DateTime             @default(now()) @db.Timestamp(6)
-    identifier         String?              @db.VarChar(128)
-    broadcast_id       String?              @db.VarChar(6)
-    failure_reason     String?
-    answer             answer[]
-    cluster_member_map cluster_member_map[]
-    connection         connection[]
-    information        information[]
-    broadcast          broadcast?           @relation(fields: [broadcast_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_interaction_broadcast_id_broadcast")
-    person             person               @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-    interaction        interaction?         @relation("interactionTointeraction", fields: [thread_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-    other_interaction  interaction[]        @relation("interactionTointeraction")
-    recommendation     recommendation[]
+    id                         String                       @id @db.VarChar(36)
+    whatsapp_id                String?                      @unique(map: "ix_interaction_whatsapp_id") @db.VarChar(128)
+    person_id                  String                       @db.VarChar(36)
+    thread_id                  String?                      @db.VarChar(36)
+    text                       String                       @db.VarChar(1024)
+    status                     String                       @db.VarChar(128)
+    category                   String?                      @db.VarChar(128)
+    type                       String?                      @db.VarChar(128)
+    created                    DateTime                     @default(now()) @db.Timestamp(6)
+    updated                    DateTime                     @default(now()) @db.Timestamp(6)
+    identifier                 String?                      @db.VarChar(128)
+    broadcast_id               String?                      @db.VarChar(6)
+    failure_reason             String?
+    ClusterMemberMap           ClusterMemberMap[]
+    answer                     answer[]
+    broadcast_text_interaction broadcast_text_interaction[]
+    connection                 connection[]
+    information                information[]
+    broadcast                  broadcast?                   @relation(fields: [broadcast_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_interaction_broadcast_id_broadcast")
+    person                     person                       @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+    interaction                interaction?                 @relation("interactionTointeraction", fields: [thread_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+    other_interaction          interaction[]                @relation("interactionTointeraction")
+    recommendation             recommendation[]
 
     @@index([broadcast_id], map: "ix_interaction_broadcast_id")
     @@index([category], map: "ix_interaction_category")
@@ -272,32 +272,44 @@ model interaction {
 }
 
 model label {
-    id                         String      @id(map: "pk_label") @db.VarChar(6)
-    created                    DateTime    @default(now()) @db.Timestamp(6)
-    updated                    DateTime    @default(now()) @db.Timestamp(6)
-    display_name               String      @db.VarChar(128)
-    phone                      String      @unique(map: "ix_label_phone") @db.VarChar(16)
-    endpoint                   String      @db.VarChar(1024)
-    credentials                String?     @db.VarChar(1024)
-    auth_logic                 String      @db.VarChar(128)
-    namespace                  String      @db.VarChar(36)
-    api_type                   String      @default("on_premise") @db.VarChar(16)
+    id                         String                  @id(map: "pk_label") @db.VarChar(6)
+    created                    DateTime                @default(now()) @db.Timestamp(6)
+    updated                    DateTime                @default(now()) @db.Timestamp(6)
+    display_name               String                  @db.VarChar(128)
+    phone                      String                  @unique(map: "ix_label_phone") @db.VarChar(16)
+    endpoint                   String                  @db.VarChar(1024)
+    credentials                String?                 @db.VarChar(1024)
+    auth_logic                 String                  @db.VarChar(128)
+    namespace                  String                  @db.VarChar(36)
+    api_type                   String                  @default("on_premise") @db.VarChar(16)
+    enabled                    Boolean                 @default(true)
+    LabelDeploymentMap         LabelDeploymentMap[]
+    Persona                    Persona[]
     broadcast                  broadcast[]
+    broadcast_text             broadcast_text[]
     cluster                    cluster[]
-    person_person_labelTolabel person[]    @relation("person_labelTolabel")
-    token_token_labelTolabel   token[]     @relation("token_labelTolabel")
+    journey_segment_label      journey_segment_label[]
+    person_person_labelTolabel person[]                @relation("person_labelTolabel")
+    token_token_labelTolabel   token[]                 @relation("token_labelTolabel")
 }
 
 model member_connection {
-    id                                            String                        @id(map: "pk_member_connection") @db.VarChar(6)
-    created                                       DateTime                      @default(now()) @db.Timestamp(6)
-    updated                                       DateTime                      @default(now()) @db.Timestamp(6)
-    status                                        String                        @db.VarChar(64)
-    requestor_id                                  String                        @db.VarChar(36)
-    responder_id                                  String                        @db.VarChar(36)
-    person_member_connection_requestor_idToperson person                        @relation("member_connection_requestor_idToperson", fields: [requestor_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_member_connection_requestor_id_person")
-    person_member_connection_responder_idToperson person                        @relation("member_connection_responder_idToperson", fields: [responder_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_member_connection_responder_id_person")
-    member_connection_changelog                   member_connection_changelog[]
+    id                                                    String                        @id(map: "pk_member_connection") @db.VarChar(6)
+    created                                               DateTime                      @default(now()) @db.Timestamp(6)
+    updated                                               DateTime                      @default(now()) @db.Timestamp(6)
+    status                                                String                        @db.VarChar(64)
+    requestor_id                                          String                        @db.VarChar(36)
+    responder_id                                          String                        @db.VarChar(36)
+    context_message                                       String?                       @db.VarChar(1024)
+    failure_reason                                        String?
+    v5                                                    Boolean                       @default(false)
+    requestorPersonaId                                    String?                       @db.VarChar(6)
+    responderPersonaId                                    String?                       @db.VarChar(6)
+    person_member_connection_requestor_idToperson         person                        @relation("member_connection_requestor_idToperson", fields: [requestor_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_member_connection_requestor_id_person")
+    person_member_connection_responder_idToperson         person                        @relation("member_connection_responder_idToperson", fields: [responder_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_member_connection_responder_id_person")
+    Persona_member_connection_requestorPersonaIdToPersona Persona?                      @relation("member_connection_requestorPersonaIdToPersona", fields: [requestorPersonaId], references: [id])
+    Persona_member_connection_responderPersonaIdToPersona Persona?                      @relation("member_connection_responderPersonaIdToPersona", fields: [responderPersonaId], references: [id])
+    member_connection_changelog                           member_connection_changelog[]
 
     @@unique([requestor_id, responder_id], map: "uq_member_connection_requestor_id")
     @@index([status], map: "ix_member_connection_status")
@@ -313,43 +325,45 @@ model member_connection_changelog {
 }
 
 model person {
-    id                                                                        String                  @id @db.VarChar(36)
-    phone                                                                     String                  @unique(map: "ix_person_phone") @db.VarChar(16)
-    name                                                                      String?                 @db.VarChar(128)
-    state                                                                     String                  @db.VarChar(128)
+    id                                                                        String                   @id @db.VarChar(36)
+    phone                                                                     String                   @unique(map: "ix_person_phone") @db.VarChar(16)
+    name                                                                      String?                  @db.VarChar(128)
+    state                                                                     String                   @db.VarChar(128)
     chats_per_week                                                            Int
-    bio                                                                       String?                 @db.VarChar(1024)
-    created                                                                   DateTime                @default(now()) @db.Timestamp(6)
-    updated                                                                   DateTime                @default(now()) @db.Timestamp(6)
-    current_connection_id                                                     String?                 @db.VarChar(36)
-    tokens                                                                    String?                 @db.VarChar(4096)
+    bio                                                                       String?                  @db.VarChar(1024)
+    created                                                                   DateTime                 @default(now()) @db.Timestamp(6)
+    updated                                                                   DateTime                 @default(now()) @db.Timestamp(6)
+    current_connection_id                                                     String?                  @db.VarChar(36)
+    tokens                                                                    String?                  @db.VarChar(4096)
     rating                                                                    Float?
-    flow_name                                                                 String?                 @db.VarChar(128)
-    linkedin                                                                  String?                 @db.VarChar(1024)
-    reco_count                                                                Int                     @default(0)
-    website                                                                   String?                 @db.VarChar(1024)
-    calendly                                                                  String?                 @db.VarChar(1024)
-    impressions                                                               Int                     @default(0)
-    label                                                                     String                  @db.VarChar(6)
-    status                                                                    String                  @default("active") @db.VarChar(128)
-    source                                                                    String                  @default("invitation_link") @db.VarChar(128)
-    is_enrichment_req                                                         Boolean                 @default(false)
-    recommended_at                                                            DateTime                @default(now()) @db.Timestamp(6)
-    notified_at                                                               DateTime                @default(now()) @db.Timestamp(6)
-    connection_request_count                                                  Int                     @default(0)
-    cluster_member_map                                                        cluster_member_map[]
-    connection_connection_connection_person_idToperson                        connection[]            @relation("connection_connection_person_idToperson")
+    flow_name                                                                 String?                  @db.VarChar(128)
+    linkedin                                                                  String?                  @db.VarChar(1024)
+    reco_count                                                                Int                      @default(0)
+    website                                                                   String?                  @db.VarChar(1024)
+    calendly                                                                  String?                  @db.VarChar(1024)
+    impressions                                                               Int                      @default(0)
+    label                                                                     String                   @db.VarChar(6)
+    status                                                                    String                   @default("active") @db.VarChar(128)
+    source                                                                    String                   @default("invitation_link") @db.VarChar(128)
+    is_enrichment_req                                                         Boolean                  @default(false)
+    recommended_at                                                            DateTime                 @default(now()) @db.Timestamp(6)
+    notified_at                                                               DateTime                 @default(now()) @db.Timestamp(6)
+    connection_request_count                                                  Int                      @default(0)
+    intervened                                                                Boolean                  @default(false)
+    connection_connection_connection_person_idToperson                        connection[]             @relation("connection_connection_person_idToperson")
     interaction                                                               interaction[]
-    member_connection_member_connection_requestor_idToperson                  member_connection[]     @relation("member_connection_requestor_idToperson")
-    member_connection_member_connection_responder_idToperson                  member_connection[]     @relation("member_connection_responder_idToperson")
-    label_person_labelTolabel                                                 label                   @relation("person_labelTolabel", fields: [label], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_label_label")
-    connection_person_current_connection_idToconnection                       connection?             @relation("person_current_connection_idToconnection", fields: [current_connection_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+    journey_segment_member                                                    journey_segment_member[]
+    member_connection_member_connection_requestor_idToperson                  member_connection[]      @relation("member_connection_requestor_idToperson")
+    member_connection_member_connection_responder_idToperson                  member_connection[]      @relation("member_connection_responder_idToperson")
+    label_person_labelTolabel                                                 label                    @relation("person_labelTolabel", fields: [label], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_label_label")
+    connection_person_current_connection_idToconnection                       connection?              @relation("person_current_connection_idToconnection", fields: [current_connection_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
     person_credit                                                             person_credit[]
-    recommendation_recommendation_requestor_idToperson                        recommendation[]        @relation("recommendation_requestor_idToperson")
-    recommendation_recommendation_responder_idToperson                        recommendation[]        @relation("recommendation_responder_idToperson")
-    recommendation_ledger_recommendation_ledger_person_idToperson             recommendation_ledger[] @relation("recommendation_ledger_person_idToperson")
-    recommendation_ledger_recommendation_ledger_recommended_person_idToperson recommendation_ledger[] @relation("recommendation_ledger_recommended_person_idToperson")
-    staff                                                                     staff[]
+    personal_intelligence                                                     personal_intelligence[]
+    recommendation_recommendation_requestor_idToperson                        recommendation[]         @relation("recommendation_requestor_idToperson")
+    recommendation_recommendation_responder_idToperson                        recommendation[]         @relation("recommendation_responder_idToperson")
+    recommendation_ledger_recommendation_ledger_person_idToperson             recommendation_ledger[]  @relation("recommendation_ledger_person_idToperson")
+    recommendation_ledger_recommendation_ledger_recommended_person_idToperson recommendation_ledger[]  @relation("recommendation_ledger_recommended_person_idToperson")
+    survey_response                                                           survey_response[]
     transaction_ledger                                                        transaction_ledger[]
 
     @@index([bio], map: "ix_person_bio")
@@ -416,9 +430,14 @@ model registered_user {
     linkedin            String?  @db.VarChar(1024)
     extra               String   @default("{}")
     person_id           String?  @db.VarChar(36)
+    checked_in          Boolean? @default(false)
 
     @@index([email], map: "ix_registered_user_email")
     @@index([name], map: "ix_registered_user_name")
+    @@index([checked_in], map: "ix_registered_user_checked_in")
+    @@index([client], map: "ix_registered_user_client")
+    @@index([phone], map: "ix_registered_user_phone")
+    @@index([registration_status], map: "ix_registered_user_registration_status")
 }
 
 model scan_log {
@@ -426,18 +445,9 @@ model scan_log {
     registered_user_id String?  @db.VarChar(6)
     created            DateTime @default(now()) @db.Timestamp(6)
     updated            DateTime @default(now()) @db.Timestamp(6)
-}
+    zone               String   @default("ENTRY") @db.VarChar(256)
 
-model staff {
-    username     String      @id(map: "pk_staff") @db.VarChar(25)
-    email        String      @db.VarChar(128)
-    created      DateTime    @default(now()) @db.Timestamp(6)
-    updated      DateTime    @default(now()) @db.Timestamp(6)
-    person_id    String      @db.VarChar(36)
-    display_name String      @db.VarChar(128)
-    broadcast    broadcast[]
-    person       person      @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_staff_person_id_person")
-    template     template[]
+    @@index([zone], map: "ix_scan_log_zone")
 }
 
 model template {
@@ -453,7 +463,7 @@ model template {
     button_values  String   @default("[]") @db.VarChar(2048)
     media_type     String   @default("header") @db.VarChar(128)
     staff_username String   @db.VarChar(25)
-    staff          staff    @relation(fields: [staff_username], references: [username], onDelete: NoAction, onUpdate: NoAction, map: "fk_template_staff_username_staff")
+    staff          Staff    @relation(fields: [staff_username], references: [username], onDelete: NoAction, onUpdate: NoAction, map: "fk_template_staff_username_staff")
 
     @@index([category], map: "ix_template_category")
 }
@@ -484,4 +494,384 @@ model transaction_ledger {
     created   DateTime @default(now()) @db.Timestamp(6)
     updated   DateTime @default(now()) @db.Timestamp(6)
     person    person?  @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_transaction_ledger_person_id_person")
+}
+
+model ClusterMemberMap {
+    id             String      @id(map: "pk_cluster_member_map") @db.VarChar(36)
+    cluster_id     String      @db.VarChar(36)
+    interaction_id String      @db.VarChar(36)
+    created        DateTime    @default(now()) @db.Timestamp(6)
+    memberId       String      @db.VarChar(36)
+    Member         Member      @relation(fields: [memberId], references: [id])
+    cluster        cluster     @relation(fields: [cluster_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_cluster_member_map_cluster_id_cluster")
+    interaction    interaction @relation(fields: [interaction_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_cluster_member_map_interaction_id_interaction")
+}
+
+model DeploymentConcierge {
+    id                String                 @id @db.VarChar(6)
+    createdAt         DateTime               @default(now())
+    updatedAt         DateTime               @default(now())
+    deploymentId      String                 @db.VarChar(6)
+    content           String
+    embedding         Unsupported("vector")?
+    embeddingRequired Boolean                @default(true)
+    title             String                 @db.VarChar(256)
+    deployment        deployment             @relation(fields: [deploymentId], references: [id])
+
+    @@index([deploymentId])
+    @@index([embedding], map: "deployment_concierge_embedding_idx")
+}
+
+model DeploymentDate {
+    id           String     @id @db.VarChar(6)
+    deploymentId String     @db.VarChar(6)
+    date         DateTime   @db.Date
+    deployment   deployment @relation(fields: [deploymentId], references: [id])
+
+    @@index([date, deploymentId])
+}
+
+model Keyword {
+    id        String   @id @db.VarChar(6)
+    createdAt DateTime @default(now())
+    personaId String   @db.VarChar(6)
+    keywords  String   @db.VarChar(1024)
+    clusterId String   @db.VarChar(36)
+    cluster   cluster  @relation(fields: [clusterId], references: [id])
+    Persona   Persona  @relation(fields: [personaId], references: [id])
+
+    @@index([personaId, clusterId])
+    @@index([personaId])
+}
+
+model LabelDeploymentMap {
+    id           String     @id @db.VarChar(6)
+    deploymentId String     @db.VarChar(6)
+    labelId      String     @db.VarChar(6)
+    created      DateTime   @default(now()) @db.Timestamp(6)
+    deployment   deployment @relation(fields: [deploymentId], references: [id])
+    label        label      @relation(fields: [labelId], references: [id])
+
+    @@unique([deploymentId, labelId])
+    @@index([deploymentId, labelId])
+}
+
+model Member {
+    id               String             @id @db.VarChar(36)
+    phone            String             @unique @db.VarChar(16)
+    createdAt        DateTime           @default(now())
+    updatedAt        DateTime           @default(now())
+    status           NumberStatus
+    source           Source
+    ClusterMemberMap ClusterMemberMap[]
+    Persona          Persona[]
+    Staff            Staff[]
+}
+
+model Persona {
+    id                                                              String              @id @db.VarChar(6)
+    name                                                            String?             @db.VarChar(128)
+    memberId                                                        String              @db.VarChar(36)
+    biography                                                       String?             @db.VarChar(1024)
+    createdAt                                                       DateTime            @default(now())
+    updatedAt                                                       DateTime            @default(now())
+    tokens                                                          String?             @db.VarChar(4096)
+    linkedin                                                        String?             @db.VarChar(1024)
+    website                                                         String?             @db.VarChar(1024)
+    labelId                                                         String              @db.VarChar(6)
+    status                                                          PersonaStatus
+    source                                                          Source
+    intervened                                                      Boolean             @default(false)
+    Keyword                                                         Keyword[]
+    label                                                           label               @relation(fields: [labelId], references: [id])
+    Member                                                          Member              @relation(fields: [memberId], references: [id])
+    member_connection_member_connection_requestorPersonaIdToPersona member_connection[] @relation("member_connection_requestorPersonaIdToPersona")
+    member_connection_member_connection_responderPersonaIdToPersona member_connection[] @relation("member_connection_responderPersonaIdToPersona")
+
+    @@unique([memberId, labelId])
+    @@index([labelId])
+    @@index([memberId])
+    @@index([source])
+    @@index([status])
+}
+
+model Staff {
+    username       String           @id(map: "pk_staff") @db.VarChar(25)
+    email          String           @db.VarChar(128)
+    created        DateTime         @default(now()) @db.Timestamp(6)
+    updated        DateTime         @default(now()) @db.Timestamp(6)
+    display_name   String           @db.VarChar(128)
+    memberId       String           @db.VarChar(36)
+    Member         Member           @relation(fields: [memberId], references: [id])
+    broadcast      broadcast[]
+    broadcast_text broadcast_text[]
+    template       template[]
+
+    @@index([memberId])
+}
+
+model broadcast_deployment_map {
+    id            String     @id(map: "pk_broadcast_deployment_map") @db.VarChar(6)
+    deployment_id String     @db.VarChar(6)
+    broadcast_id  String     @db.VarChar(6)
+    created       DateTime   @default(now()) @db.Timestamp(6)
+    broadcast     broadcast  @relation(fields: [broadcast_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_broadcast_deployment_map_broadcast_id_broadcast")
+    deployment    deployment @relation(fields: [deployment_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_broadcast_deployment_map_deployment_id_deployment")
+
+    @@index([broadcast_id], map: "ix_broadcast_deployment_map_broadcast_id")
+    @@index([deployment_id], map: "ix_broadcast_deployment_map_deployment_id")
+}
+
+model broadcast_text {
+    id                         String                       @id(map: "pk_broadcast_text") @db.VarChar(6)
+    created                    DateTime                     @default(now()) @db.Timestamp(6)
+    updated                    DateTime                     @default(now()) @db.Timestamp(6)
+    status                     String                       @default("ongoing") @db.VarChar(16)
+    consent_template           String?                      @db.VarChar(128)
+    content                    String                       @db.VarChar(1024)
+    links                      String                       @default("[]") @db.VarChar(2014)
+    buttons                    String                       @default("[]") @db.VarChar(1024)
+    label_id                   String                       @default("BSPzUv") @db.VarChar(6)
+    staff_username             String?                      @db.VarChar(25)
+    admin_username             String?                      @db.VarChar(16)
+    media_id                   String?                      @db.VarChar(128)
+    cluster_admin              cluster_admin?               @relation(fields: [admin_username], references: [phone], onDelete: NoAction, onUpdate: NoAction, map: "fk_broadcast_text_admin_username_cluster_admin")
+    label                      label                        @relation(fields: [label_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_broadcast_text_label_id_label")
+    Staff                      Staff?                       @relation(fields: [staff_username], references: [username], onDelete: NoAction, onUpdate: NoAction, map: "fk_broadcast_text_staff_username_staff")
+    broadcast_text_interaction broadcast_text_interaction[]
+}
+
+model broadcast_text_interaction {
+    id                String         @id(map: "pk_broadcast_text_interaction") @db.VarChar(6)
+    created           DateTime       @default(now()) @db.Timestamp(6)
+    broadcast_text_id String         @db.VarChar(6)
+    interaction_id    String         @db.VarChar(36)
+    broadcast_text    broadcast_text @relation(fields: [broadcast_text_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_broadcast_text_interaction_broadcast_text_id_broadcast_text")
+    interaction       interaction    @relation(fields: [interaction_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_broadcast_text_interaction_interaction_id_interaction")
+
+    @@index([broadcast_text_id], map: "ix_broadcast_text_interaction_broadcast_text_id")
+    @@index([interaction_id], map: "ix_broadcast_text_interaction_interaction_id")
+}
+
+model corporate_connections_registered {
+    phone String @id(map: "pk_corporate_connections_registered") @db.VarChar(20)
+}
+
+model flow_synonym {
+    id      String   @id(map: "pk_flow_synonym") @db.VarChar(6)
+    created DateTime @default(now()) @db.Timestamp(6)
+    word    String
+    synonym String
+    flow_id String   @db.VarChar(36)
+    event   event    @relation(fields: [flow_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_flow_synonym_flow_id_event")
+
+    @@index([flow_id], map: "ix_flow_synonym_flow_id")
+    @@index([synonym], map: "ix_flow_synonym_synonym")
+    @@index([word], map: "ix_flow_synonym_word")
+}
+
+model global_intelligence {
+    id        String   @id(map: "pk_global_intelligence") @db.VarChar(8)
+    created   DateTime @default(now()) @db.Timestamp(6)
+    code      String   @db.VarChar(64)
+    responses String   @db.VarChar(1024)
+    input     String   @db.VarChar(1024)
+
+    @@index([code], map: "ix_global_intelligence_code")
+    @@index([input], map: "ix_global_intelligence_input")
+}
+
+model interaction_status {
+    id              String   @id(map: "pk_interaction_status") @db.VarChar(6)
+    whatsapp_id     String   @db.VarChar(128)
+    created         DateTime @default(now()) @db.Timestamp(6)
+    whatsapp_status String   @db.VarChar(64)
+    processed_count Int      @default(0)
+    status          String   @default("PENDING") @db.VarChar(64)
+    failure_reason  String?
+
+    @@index([status], map: "ix_interaction_status_status")
+    @@index([whatsapp_id], map: "ix_interaction_status_whatsapp_id")
+    @@index([whatsapp_status], map: "ix_interaction_status_whatsapp_status")
+}
+
+model journey {
+    id                      String                    @id(map: "pk_journey") @db.VarChar(6)
+    created                 DateTime                  @default(now()) @db.Timestamp(6)
+    updated                 DateTime                  @default(now()) @db.Timestamp(6)
+    display_name            String                    @db.VarChar(128)
+    enabled                 Boolean                   @default(false)
+    conditions              String                    @default("{}")
+    member_limit            Int?
+    randomizer              Boolean                   @default(false)
+    journey_action          journey_action[]
+    journey_ledger          journey_ledger[]
+    journey_schedule        journey_schedule[]
+    journey_segment_cluster journey_segment_cluster[]
+    journey_segment_label   journey_segment_label[]
+    journey_segment_member  journey_segment_member[]
+}
+
+model journey_action {
+    id         String   @id(map: "pk_journey_action") @db.VarChar(6)
+    created    DateTime @default(now()) @db.Timestamp(6)
+    journey_id String   @db.VarChar(6)
+    code       String   @db.VarChar(128)
+    parameters String   @default("{}")
+    journey    journey  @relation(fields: [journey_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_journey_action_journey_id_journey")
+}
+
+model journey_ledger {
+    id               String           @id(map: "pk_journey_ledger") @db.VarChar(6)
+    created          DateTime         @default(now()) @db.Timestamp(6)
+    journey_id       String           @db.VarChar(6)
+    updated          DateTime         @default(now()) @db.Timestamp(6)
+    status           String           @default("active") @db.VarChar(128)
+    schedule_id      String           @db.VarChar(6)
+    journey          journey          @relation(fields: [journey_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_journey_ledger_journey_id_journey")
+    journey_schedule journey_schedule @relation(fields: [schedule_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_journey_ledger_schedule_id_journey_schedule")
+
+    @@index([status], map: "ix_journey_ledger_status")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model journey_schedule {
+    id                String           @id(map: "pk_journey_schedule") @db.VarChar(6)
+    created           DateTime         @default(now()) @db.Timestamp(6)
+    journey_id        String           @db.VarChar(6)
+    type              String           @default("once") @db.VarChar(16)
+    absolute          String?          @db.VarChar(64)
+    relative_minutes  Int?
+    relative_function String?          @db.VarChar(64)
+    journey_ledger    journey_ledger[]
+    journey           journey          @relation(fields: [journey_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_journey_schedule_journey_id_journey")
+}
+
+model journey_segment_cluster {
+    id         String   @id(map: "pk_journey_segment_cluster") @db.VarChar(6)
+    created    DateTime @default(now()) @db.Timestamp(6)
+    journey_id String   @db.VarChar(6)
+    cluster_id String   @db.VarChar(36)
+    cluster    cluster  @relation(fields: [cluster_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_journey_segment_cluster_cluster_id_cluster")
+    journey    journey  @relation(fields: [journey_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_journey_segment_cluster_journey_id_journey")
+}
+
+model journey_segment_label {
+    id         String   @id(map: "pk_journey_segment_label") @db.VarChar(6)
+    created    DateTime @default(now()) @db.Timestamp(6)
+    journey_id String   @db.VarChar(6)
+    label_id   String   @db.VarChar(6)
+    journey    journey  @relation(fields: [journey_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_journey_segment_label_journey_id_journey")
+    label      label    @relation(fields: [label_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_journey_segment_label_label_id_label")
+}
+
+model journey_segment_member {
+    id         String   @id(map: "pk_journey_segment_member") @db.VarChar(6)
+    created    DateTime @default(now()) @db.Timestamp(6)
+    journey_id String   @db.VarChar(6)
+    member_id  String   @db.VarChar(36)
+    journey    journey  @relation(fields: [journey_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_journey_segment_member_journey_id_journey")
+    person     person   @relation(fields: [member_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_journey_segment_member_member_id_person")
+}
+
+model notification {
+    id            String         @id(map: "pk_notification") @db.VarChar(6)
+    created       DateTime       @default(now()) @db.Timestamp(6)
+    updated       DateTime       @default(now()) @db.Timestamp(6)
+    title         String         @db.VarChar(512)
+    message       String         @db.VarChar(1024)
+    link          String?        @db.VarChar(1024)
+    is_read       Boolean        @default(false)
+    admin_id      String?        @db.VarChar(6)
+    cluster_admin cluster_admin? @relation(fields: [admin_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_admin_id_cluster_admin")
+}
+
+model one_percent_registered {
+    phone String @id(map: "pk_one_percent_registered") @db.VarChar(20)
+}
+
+model personal_intelligence {
+    id        String   @id(map: "pk_personal_intelligence") @db.VarChar(8)
+    person_id String   @db.VarChar(36)
+    created   DateTime @default(now()) @db.Timestamp(6)
+    code      String   @db.VarChar(64)
+    responses String   @db.VarChar(1024)
+    input     String   @db.VarChar(1024)
+    person    person   @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_personal_intelligence_person_id_person")
+
+    @@index([code], map: "ix_personal_intelligence_code")
+    @@index([input], map: "ix_personal_intelligence_input")
+    @@index([person_id], map: "ix_personal_intelligence_person_id")
+}
+
+model raw_data_info {
+    id            String        @id(map: "pk_raw_data_info") @db.VarChar(6)
+    created       DateTime      @default(now()) @db.Timestamp(6)
+    updated       DateTime      @default(now()) @db.Timestamp(6)
+    admin_id      String        @db.VarChar(6)
+    cluster_id    String        @db.VarChar(36)
+    file_name     String        @db.VarChar(512)
+    record_count  Int
+    status        String        @db.VarChar(16)
+    cluster_admin cluster_admin @relation(fields: [admin_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_raw_data_info_admin_id_cluster_admin")
+    cluster       cluster       @relation(fields: [cluster_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_raw_data_info_cluster_id_cluster")
+
+    @@index([admin_id], map: "ix_raw_data_info_admin_id")
+    @@index([cluster_id], map: "ix_raw_data_info_cluster_id")
+    @@index([status], map: "ix_raw_data_info_status")
+}
+
+model survey {
+    id                  String            @id(map: "pk_survey") @db.VarChar(6)
+    created             DateTime          @default(now()) @db.Timestamp(6)
+    updated             DateTime          @default(now()) @db.Timestamp(6)
+    broadcast_id        String            @db.VarChar(6)
+    column_name_mapping String            @default("{}")
+    broadcast           broadcast         @relation(fields: [broadcast_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_survey_broadcast_id_broadcast")
+    survey_response     survey_response[]
+
+    @@index([broadcast_id], map: "ix_survey_broadcast_id")
+}
+
+model survey_response {
+    id            String   @id(map: "pk_survey_response") @db.VarChar(6)
+    created       DateTime @default(now()) @db.Timestamp(6)
+    survey_id     String   @db.VarChar(6)
+    response_json String
+    person_id     String   @db.VarChar(36)
+    person        person   @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_survey_response_person_id_person")
+    survey        survey   @relation(fields: [survey_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_survey_response_survey_id_survey")
+
+    @@index([person_id], map: "ix_survey_response_person_id")
+    @@index([survey_id], map: "ix_survey_response_survey_id")
+}
+
+model synonym {
+    id      String   @id(map: "pk_synonym") @db.VarChar(6)
+    created DateTime @default(now()) @db.Timestamp(6)
+    word    String
+    synonym String
+
+    @@index([synonym], map: "ix_synonym_synonym")
+    @@index([word], map: "ix_synonym_word")
+}
+
+enum NumberStatus {
+    ACTIVE
+    INACTIVE
+    INVALID
+}
+
+enum PersonaStatus {
+    BLACKLISTED
+    UNSUBSCRIBED
+    ACTIVE
+    INACTIVE
+}
+
+enum Source {
+    STAFF_IMPORT
+    ADMIN_IMPORT
+    INVITE_LINK
+    BROADCAST
 }
