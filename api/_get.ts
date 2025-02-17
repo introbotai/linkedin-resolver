@@ -33,7 +33,10 @@ async function handler(req: VercelRequest, res: VercelResponse) {
     const [name, startId] = split
     console.log(`Name: ${name} and ID starts with: ${startId}`)
 
-    const member = await db.person.findFirst({
+    const persona = await db.persona.findFirst({
+        include: {
+            Member: true,
+        },
         where: {
             id: {
                 startsWith: startId,
@@ -45,28 +48,28 @@ async function handler(req: VercelRequest, res: VercelResponse) {
         },
     })
 
-    if (!member) {
+    if (!persona) {
         console.log('Profile was not found in our database')
-        return res.status(404).send('Profile not found')
+        return res.status(404).send('Persona not found')
     }
 
-    if (!member.linkedin) {
+    if (!persona.linkedin) {
         console.log('Profile does not have a LinkedIn link')
-        return res.status(404).send(`${member.name} hasn't provided a LinkedIn`)
+        return res.status(404).send(`${persona.name} hasn't provided a LinkedIn`)
     }
 
     // fire the required Mixpanel events
-    await mixpanel.track.setProfile({ id: member.id, name: member.name, phone: member.phone })
+    await mixpanel.track.setProfile({ name: persona.name, id: persona.memberId, phone: persona.Member.phone })
     await mixpanel.track.linkedInClicked({
         pathName: id,
-        id: member.id,
-        target: member.linkedin,
+        id: persona.memberId,
+        target: persona.linkedin,
     })
 
     // url encode the username because people have weird characters
     // in their usernames 🙄
-    const linkedinUsername = encodeURIComponent(member.linkedin.split('/').pop())
-    const hostname = member.linkedin.split('/').toSpliced(-1, 1)
+    const linkedinUsername = encodeURIComponent(persona.linkedin.split('/').pop())
+    const hostname = persona.linkedin.split('/').toSpliced(-1, 1)
     const target = `https://${hostname.join('/')}/${linkedinUsername}`
     res.setHeader('Location', target)
 
