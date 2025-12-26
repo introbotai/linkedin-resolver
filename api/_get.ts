@@ -33,20 +33,18 @@ async function handler(req: VercelRequest, res: VercelResponse) {
     const [name, startId] = split
     console.log(`Name: ${name} and ID starts with: ${startId}`)
 
-    const persona = await db.persona.findFirst({
-        include: {
-            Member: true,
-        },
-        where: {
-            id: {
-                startsWith: startId,
-            },
-            name: {
-                startsWith: name,
-                mode: 'insensitive',
-            },
-        },
-    })
+    const persona = await db.selectFrom('Persona')
+        .innerJoin('Member', 'Member.id', 'Persona.memberId')
+        .select([
+            'Persona.id',
+            'Persona.name',
+            'Persona.linkedin',
+            'Persona.memberId',
+            'Member.phone',
+        ])
+        .where('Persona.id', 'like', `${startId}%`)
+        .where('Persona.name', 'ilike', `${name}%`)
+        .executeTakeFirst()
 
     if (!persona) {
         console.log('Profile was not found in our database')
@@ -59,7 +57,7 @@ async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // fire the required Mixpanel events
-    await mixpanel.track.setProfile({ name: persona.name, id: persona.memberId, phone: persona.Member.phone })
+    await mixpanel.track.setProfile({ name: persona.name, id: persona.memberId, phone: persona.phone })
     await mixpanel.track.linkedInClicked({
         pathName: id,
         id: persona.memberId,

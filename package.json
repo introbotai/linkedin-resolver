@@ -31,10 +31,16 @@
         "typescript": "^5.7.3"
     },
     "dependencies": {
-        "@prisma/client": "6.3.1",
+        "@prisma/client": "^7.2.0",
+        "@types/pg": "^8.16.0",
         "@vercel/node": "^5.1.7",
+        "kysely": "^0.28.9",
+        "luxon": "^3.7.2",
         "mixpanel": "^0.18.0",
-        "prisma": "^6.3.1",
+        "nanoid": "^5.1.5",
+        "pg": "^8.16.3",
+        "prisma": "^7.2.0",
+        "prisma-kysely": "^2.2.1",
         "serverless-utilities": "^0.0.22",
         "vercel": "^41.1.4",
         "zod": "^3.24.2"
