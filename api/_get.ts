@@ -9,9 +9,9 @@ import { type VercelRequest, type VercelResponse } from '@vercel/node'
 import { db } from '../utils/db.js'
 import * as mixpanel from '../utils/mixpanel/index.js'
 
-const querySchema = z.object({
+const querySchema = z.strictObject({
     id: z.string(),
-}).strict()
+})
 
 async function handler(req: VercelRequest, res: VercelResponse) {
     const { id } = req.query as z.infer<typeof querySchema>

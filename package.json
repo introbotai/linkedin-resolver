@@ -43,6 +43,6 @@
         "prisma-kysely": "^2.2.1",
         "serverless-utilities": "^0.0.22",
         "vercel": "^41.1.4",
-        "zod": "^3.24.2"
+        "zod": "^4.2.1"
     }
 }
