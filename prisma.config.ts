@@ -1,6 +1,6 @@
 /*
  *  Prisma configuration file for linkedin-resolver project
- *  Created On 26 Dec 2024
+ *  Created On 26 Dec 2025
  */
 
 import { defineConfig, env } from 'prisma/config'

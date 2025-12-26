@@ -1,7 +1,6 @@
 /*
  *  Database connection utility using Kysely for linkedin-resolver project
  *  Created On 21 May 2024
- *  Updated On 26 Dec 2024 - Migrated from Prisma to Kysely
  */
 
 import pg from 'pg'
