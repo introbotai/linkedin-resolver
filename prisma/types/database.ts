@@ -142,6 +142,34 @@ export const WhatsAppTemplateStatus = {
     REJECTED: 'REJECTED',
 } as const
 export type WhatsAppTemplateStatus = (typeof WhatsAppTemplateStatus)[keyof typeof WhatsAppTemplateStatus]
+export const DeploymentAPIKeyPurpose = {
+    DEPLOYMENT: 'DEPLOYMENT',
+} as const
+export type DeploymentAPIKeyPurpose = (typeof DeploymentAPIKeyPurpose)[keyof typeof DeploymentAPIKeyPurpose]
+export const DeploymentWhatsAppTemplatePurpose = {
+    ENTRY_QR: 'ENTRY_QR',
+    ZONE_REPORT: 'ZONE_REPORT',
+    ZONE_SCANNER: 'ZONE_SCANNER',
+} as const
+export type DeploymentWhatsAppTemplatePurpose = (typeof DeploymentWhatsAppTemplatePurpose)[keyof typeof DeploymentWhatsAppTemplatePurpose]
+export const RegistrationKeyDataType = {
+    LINK: 'LINK',
+    TIME: 'TIME',
+    PHONE: 'PHONE',
+    STRING: 'STRING',
+    BOOLEAN: 'BOOLEAN',
+    CHIP_DARK: 'CHIP_DARK',
+    CHECKED_IN: 'CHECKED_IN',
+} as const
+export type RegistrationKeyDataType = (typeof RegistrationKeyDataType)[keyof typeof RegistrationKeyDataType]
+export const RegistrationPostScanPageKeyDataType = {
+    LINK: 'LINK',
+    TIME: 'TIME',
+    PHONE: 'PHONE',
+    STRING: 'STRING',
+    BOOLEAN: 'BOOLEAN',
+} as const
+export type RegistrationPostScanPageKeyDataType = (typeof RegistrationPostScanPageKeyDataType)[keyof typeof RegistrationPostScanPageKeyDataType]
 export type AuthLog = {
     status: LoginStatus;
     id: string;
@@ -230,7 +258,13 @@ export type Cluster = {
     created: Generated<Timestamp>;
     updated: Generated<Timestamp>;
 }
-export type cluster_admin = {
+export type ClusterAccess = {
+    id: string;
+    fromClusterId: string;
+    toClusterId: string;
+    created: Generated<Timestamp>;
+}
+export type ClusterAdmin = {
     id: string;
     phone: string;
     created: Generated<Timestamp>;
@@ -249,18 +283,6 @@ export type cluster_admin = {
     industry: string | null;
     teamSize: string | null;
     website: string | null;
-}
-export type cluster_deployment_map = {
-    id: string;
-    cluster_id: string;
-    deployment_id: string;
-    created: Generated<Timestamp>;
-}
-export type ClusterAccess = {
-    id: string;
-    fromClusterId: string;
-    toClusterId: string;
-    created: Generated<Timestamp>;
 }
 export type ClusterConfig = {
     id: string;
@@ -305,6 +327,12 @@ export type ClusterCopy = {
     flowId: string;
     frameId: string;
     content: string;
+}
+export type ClusterDeploymentMap = {
+    id: string;
+    cluster_id: string;
+    deployment_id: string;
+    created: Generated<Timestamp>;
 }
 export type ClusterMemberMap = {
     id: string;
@@ -376,35 +404,27 @@ export type DataPlusRecords = {
     rawJson: Generated<unknown>;
     linkedinProfile: Generated<unknown>;
 }
-export type deployment = {
+export type Deployment = {
     id: string;
-    name: string;
     config: string;
-    is_enabled: boolean;
-    created: Generated<Timestamp>;
-    updated: Generated<Timestamp>;
+    createdAt: Generated<Timestamp>;
+    updatedAt: Generated<Timestamp>;
     title: Generated<string>;
-    send_all_count: Generated<number>;
-    send_all_limit: Generated<number>;
-    themeColor: Generated<string>;
+    logoUrl: string | null;
+    mapUrl: string | null;
+    place: string | null;
+    time: string | null;
+    type: Generated<string>;
+}
+export type DeploymentAPIKey = {
+    id: string;
+    createdAt: Generated<Timestamp>;
+    generatedAt: Generated<Timestamp>;
+    expiresAt: Timestamp | null;
     apiKey: string;
-    onboardingFinished: Generated<boolean>;
-    onboardingMeetingLink: string | null;
-    onboardingMeetingTime: Generated<Timestamp>;
-    conciergeEnabled: Generated<boolean>;
-    conciergeFineTunes: Generated<unknown>;
-    conciergeResponseGuidelines: Generated<unknown>;
-    approvalEmailTemplateUserTypeMap: Generated<unknown>;
-    zoneScannerTemplateId: string | null;
-    novaEBadge: Generated<boolean>;
-    zoneReportTemplateId: string | null;
-    whatsappQRCodeVariables: Generated<unknown>;
-    scanPageTemplate: Generated<string>;
-    groupCheckInConditions: Generated<unknown>;
-    checkInRichCardDetails: Generated<unknown>;
-    allowPartnerScanDelete: Generated<boolean>;
-    allowPartnerScanDownload: Generated<boolean>;
-    leadScannerDetails: Generated<unknown>;
+    purpose: DeploymentAPIKeyPurpose;
+    comments: string | null;
+    deploymentId: string;
 }
 export type DeploymentConcierge = {
     id: string;
@@ -420,6 +440,27 @@ export type DeploymentConcierge = {
     adminId: string | null;
     staffUsername: string | null;
     status: Generated<ConciergeTrainingStatus>;
+}
+export type DeploymentConfig = {
+    id: string;
+    deploymentId: string;
+    createdAt: Generated<Timestamp>;
+    updatedAt: Generated<Timestamp>;
+    defaultUserType: Generated<string>;
+    themeColor: Generated<string>;
+    sendAllCount: Generated<number>;
+    sendAllLimit: Generated<number>;
+    onboardingFinished: Generated<boolean>;
+    onboardingMeetingLink: string | null;
+    onboardingMeetingTime: Timestamp | null;
+    novaEBadge: Generated<boolean>;
+    scanPageHandlebars: string | null;
+    conciergeEnabled: Generated<boolean>;
+    conciergeFineTunes: Generated<unknown>;
+    conciergeResponseGuidelines: Generated<unknown>;
+    allowPartnerScanDelete: Generated<boolean>;
+    allowPartnerScanDownload: Generated<boolean>;
+    isApprovalRequired: Generated<boolean>;
 }
 export type DeploymentDate = {
     id: string;
@@ -437,6 +478,16 @@ export type DeploymentEmail = {
     userType: string | null;
     subject: Generated<string>;
     fromEmail: Generated<string>;
+}
+export type DeploymentWhatsAppTemplate = {
+    id: string;
+    deploymentId: string;
+    labelId: string;
+    templateId: string;
+    variables: Generated<unknown>;
+    purpose: DeploymentWhatsAppTemplatePurpose;
+    createdAt: Generated<Timestamp>;
+    updatedAt: Generated<Timestamp>;
 }
 export type DiscoveryData = {
     id: string;
@@ -571,6 +622,15 @@ export type global_intelligence = {
     responses: string;
     input: string;
 }
+export type GroupCheckInCondition = {
+    id: string;
+    deploymentId: string;
+    enabled: Generated<boolean>;
+    conditionKey: string;
+    conditionValue: string;
+    createdAt: Generated<Timestamp>;
+    updatedAt: Generated<Timestamp>;
+}
 export type IntentClassification = {
     id: string;
     example: string;
@@ -677,6 +737,16 @@ export type LabelDeploymentMap = {
     labelId: string;
     created: Generated<Timestamp>;
 }
+export type LeadScannerKey = {
+    id: string;
+    deploymentId: string;
+    keyName: string;
+    name: string;
+    icon: string;
+    break: Generated<boolean>;
+    createdAt: Generated<Timestamp>;
+    updatedAt: Generated<Timestamp>;
+}
 export type Member = {
     id: string;
     phone: string;
@@ -757,13 +827,12 @@ export type raw_data_info = {
     record_count: number;
     status: string;
 }
-export type registered_user = {
+export type RegisteredUser = {
     id: string;
     phone: string | null;
     name: string | null;
     email: string | null;
     meta_data: Generated<unknown>;
-    client: string;
     created: Generated<Timestamp>;
     updated: Generated<Timestamp>;
     user_type: string | null;
@@ -780,7 +849,45 @@ export type registered_user = {
     offlineId: string | null;
     deploymentId: string | null;
 }
-export type scan_log = {
+export type RegistrationBadgeCardKey = {
+    id: string;
+    deploymentId: string;
+    keyName: string;
+    name: string;
+    icon: string;
+    break: Generated<boolean>;
+    createdAt: Generated<Timestamp>;
+    updatedAt: Generated<Timestamp>;
+}
+export type RegistrationPostScanPageKey = {
+    id: string;
+    deploymentId: string;
+    keyName: string;
+    dataType: RegistrationPostScanPageKeyDataType;
+    createdAt: Generated<Timestamp>;
+    updatedAt: Generated<Timestamp>;
+}
+export type RegistrationTableKey = {
+    id: string;
+    deploymentId: string;
+    keyName: string;
+    dataType: RegistrationKeyDataType;
+    isSortable: Generated<boolean>;
+    width: Generated<number>;
+    createdAt: Generated<Timestamp>;
+    updatedAt: Generated<Timestamp>;
+}
+export type RegistrationTallyMapping = {
+    id: string;
+    deploymentId: string;
+    questionId: string;
+    keyName: string;
+    order: Generated<number>;
+    separator: string | null;
+    createdAt: Generated<Timestamp>;
+    updatedAt: Generated<Timestamp>;
+}
+export type ScanLog = {
     id: string;
     registered_user_id: string | null;
     created: Generated<Timestamp>;
@@ -901,11 +1008,11 @@ export type DB = {
     BroadcastTarget: BroadcastTarget;
     CADeploymentMap: CADeploymentMap;
     Cluster: Cluster;
-    cluster_admin: cluster_admin;
-    cluster_deployment_map: cluster_deployment_map;
     ClusterAccess: ClusterAccess;
+    ClusterAdmin: ClusterAdmin;
     ClusterConfig: ClusterConfig;
     ClusterCopy: ClusterCopy;
+    ClusterDeploymentMap: ClusterDeploymentMap;
     ClusterMemberMap: ClusterMemberMap;
     ClusterSynonym: ClusterSynonym;
     Cohorts: Cohorts;
@@ -915,10 +1022,13 @@ export type DB = {
     CustomMenu: CustomMenu;
     DataPlusFiles: DataPlusFiles;
     DataPlusRecords: DataPlusRecords;
-    deployment: deployment;
+    Deployment: Deployment;
+    DeploymentAPIKey: DeploymentAPIKey;
     DeploymentConcierge: DeploymentConcierge;
+    DeploymentConfig: DeploymentConfig;
     DeploymentDate: DeploymentDate;
     DeploymentEmail: DeploymentEmail;
+    DeploymentWhatsAppTemplate: DeploymentWhatsAppTemplate;
     DiscoveryData: DiscoveryData;
     DiscoveryFile: DiscoveryFile;
     Email: Email;
@@ -935,6 +1045,7 @@ export type DB = {
     GBBUser: GBBUser;
     GBBUserCompanyMap: GBBUserCompanyMap;
     global_intelligence: global_intelligence;
+    GroupCheckInCondition: GroupCheckInCondition;
     IntentClassification: IntentClassification;
     Interaction: Interaction;
     journey: journey;
@@ -947,6 +1058,7 @@ export type DB = {
     Keyword: Keyword;
     Label: Label;
     LabelDeploymentMap: LabelDeploymentMap;
+    LeadScannerKey: LeadScannerKey;
     Member: Member;
     MemberConnection: MemberConnection;
     MemberConnectionChangelog: MemberConnectionChangelog;
@@ -955,8 +1067,12 @@ export type DB = {
     one_percent_registered: one_percent_registered;
     Persona: Persona;
     raw_data_info: raw_data_info;
-    registered_user: registered_user;
-    scan_log: scan_log;
+    RegisteredUser: RegisteredUser;
+    RegistrationBadgeCardKey: RegistrationBadgeCardKey;
+    RegistrationPostScanPageKey: RegistrationPostScanPageKey;
+    RegistrationTableKey: RegistrationTableKey;
+    RegistrationTallyMapping: RegistrationTallyMapping;
+    ScanLog: ScanLog;
     Staff: Staff;
     Survey: Survey;
     SurveyBroadcastMap: SurveyBroadcastMap;
