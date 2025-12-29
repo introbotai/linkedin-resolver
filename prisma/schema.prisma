@@ -8,145 +8,6 @@ datasource db {
     provider = "postgresql"
 }
 
-model cluster_admin {
-    id                        String                @id(map: "pk_cluster_admin") @db.VarChar(6)
-    phone                     String                @unique(map: "ix_cluster_admin_phone") @db.VarChar(16)
-    created                   DateTime              @default(now()) @db.Timestamp(6)
-    updated                   DateTime              @default(now()) @db.Timestamp(6)
-    display_name              String                @db.VarChar(128)
-    mixpanel_analytics        String?               @db.VarChar(1024)
-    feature_flags             String                @default("[]") @db.VarChar(1024)
-    invitee_approved_template String?               @db.VarChar(1024)
-    event_key                 String?               @db.VarChar(1024)
-    api_key                   String?               @db.VarChar(1024)
-    businessAddress           String?               @db.VarChar(256)
-    businessEmail             String?               @db.VarChar(128)
-    businessName              String?               @db.VarChar(128)
-    businessType              String?               @db.VarChar(128)
-    country                   String?               @db.VarChar(128)
-    industry                  String?               @db.VarChar(128)
-    teamSize                  String?               @db.VarChar(128)
-    website                   String?               @db.VarChar(128)
-    Broadcast                 Broadcast[]
-    CADeploymentMap           CADeploymentMap[]
-    DeploymentConcierge       DeploymentConcierge[]
-    Notification              Notification[]
-    raw_data_info             raw_data_info[]
-}
-
-model cluster_deployment_map {
-    id            String     @id(map: "pk_cluster_deployment_map") @db.VarChar(36)
-    cluster_id    String     @db.VarChar(36)
-    deployment_id String     @db.VarChar(6)
-    created       DateTime   @default(now()) @db.Timestamp(6)
-    cluster       Cluster    @relation(fields: [cluster_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_cluster_deployment_map_cluster_id_cluster")
-    deployment    deployment @relation(fields: [deployment_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_cluster_deployment_map_deployment_id_deployment")
-}
-
-model deployment {
-    id                                                                  String                   @id(map: "pk_deployment") @db.VarChar(6)
-    name                                                                String                   @unique(map: "uq_deployment_name") @db.VarChar(255)
-    config                                                              String
-    is_enabled                                                          Boolean
-    created                                                             DateTime                 @default(now()) @db.Timestamp(6)
-    updated                                                             DateTime                 @default(now()) @db.Timestamp(6)
-    title                                                               String                   @default("New Event") @db.VarChar(255)
-    send_all_count                                                      Int                      @default(0)
-    send_all_limit                                                      Int                      @default(3)
-    themeColor                                                          String                   @default("000000") @db.VarChar(10)
-    apiKey                                                              String                   @db.VarChar(32)
-    onboardingFinished                                                  Boolean                  @default(false)
-    onboardingMeetingLink                                               String?                  @db.VarChar(256)
-    onboardingMeetingTime                                               DateTime                 @default(now()) @db.Timestamp(6)
-    conciergeEnabled                                                    Boolean                  @default(false)
-    conciergeFineTunes                                                  Json                     @default("[]")
-    conciergeResponseGuidelines                                         Json                     @default("[]")
-    approvalEmailTemplateUserTypeMap                                    Json                     @default("{}")
-    zoneScannerTemplateId                                               String?                  @db.VarChar(6)
-    novaEBadge                                                          Boolean                  @default(false)
-    zoneReportTemplateId                                                String?                  @db.VarChar(6)
-    whatsappQRCodeVariables                                             Json                     @default("[]")
-    scanPageTemplate                                                    String                   @default("{{deployment.title}}<br /><br />Date: {{deployment.dates}}<br />Place: {{deployment.config.place}}<br /><br />")
-    groupCheckInConditions                                              Json                     @default("[]")
-    checkInRichCardDetails                                              Json                     @default("[]")
-    allowPartnerScanDelete                                              Boolean                  @default(false)
-    allowPartnerScanDownload                                            Boolean                  @default(true)
-    leadScannerDetails                                                  Json                     @default("[{\"key\": \"name\", \"icon\": \"FolderPen\", \"name\": \"Name\", \"break\": true}]")
-    BroadcastDeploymentMap                                              BroadcastDeploymentMap[]
-    BroadcastRecipient                                                  BroadcastRecipient[]
-    CADeploymentMap                                                     CADeploymentMap[]
-    DeploymentConcierge                                                 DeploymentConcierge[]
-    DeploymentDate                                                      DeploymentDate[]
-    DeploymentEmail                                                     DeploymentEmail[]
-    Email                                                               Email[]
-    GBBAM                                                               GBBAM[]
-    GBBCompanyInfo                                                      GBBCompanyInfo[]
-    GBBConfig                                                           GBBConfig[]
-    GBBEmptyMeeting                                                     GBBEmptyMeeting[]
-    GBBMeeting                                                          GBBMeeting[]
-    GBBTable                                                            GBBTable[]
-    LabelDeploymentMap                                                  LabelDeploymentMap[]
-    SurveyDeploymentMap                                                 SurveyDeploymentMap[]
-    ZoneGroup                                                           ZoneGroup[]
-    ZoneUser                                                            ZoneUser[]
-    cluster_deployment_map                                              cluster_deployment_map[]
-    WhatsAppTemplate_deployment_zoneReportTemplateIdToWhatsAppTemplate  WhatsAppTemplate?        @relation("deployment_zoneReportTemplateIdToWhatsAppTemplate", fields: [zoneReportTemplateId], references: [id])
-    WhatsAppTemplate_deployment_zoneScannerTemplateIdToWhatsAppTemplate WhatsAppTemplate?        @relation("deployment_zoneScannerTemplateIdToWhatsAppTemplate", fields: [zoneScannerTemplateId], references: [id])
-    registered_user                                                     registered_user[]
-}
-
-model registered_user {
-    id                  String      @id(map: "pk_registered_user") @db.VarChar(6)
-    phone               String?     @db.VarChar(16)
-    name                String?     @db.VarChar(128)
-    email               String?     @db.VarChar(128)
-    meta_data           Json        @default("{}")
-    client              String      @db.VarChar(128)
-    created             DateTime    @default(now()) @db.Timestamp(6)
-    updated             DateTime    @default(now()) @db.Timestamp(6)
-    user_type           String?     @db.VarChar(32)
-    registration_status String      @default("CREATED") @db.VarChar(16)
-    tally_id            String?     @db.VarChar(32)
-    linkedin            String?     @db.VarChar(1024)
-    extra               String      @default("{}")
-    checked_in          Boolean?    @default(false)
-    memberId            String?     @db.VarChar(36)
-    personaId           String?     @db.VarChar(6)
-    deleted             Boolean?    @default(false)
-    vendorId            String?     @unique @db.VarChar(32)
-    scanCondition       Json        @default("{}")
-    offlineId           String?     @db.VarChar(32)
-    deploymentId        String?     @db.VarChar(6)
-    GBBUser             GBBUser[]
-    deployment          deployment? @relation(fields: [deploymentId], references: [id])
-    Member              Member?     @relation(fields: [memberId], references: [id])
-    Persona             Persona?    @relation(fields: [personaId], references: [id])
-
-    @@index([email], map: "ix_registered_user_email")
-    @@index([name], map: "ix_registered_user_name")
-    @@index([checked_in], map: "ix_registered_user_checked_in")
-    @@index([client], map: "ix_registered_user_client")
-    @@index([phone], map: "ix_registered_user_phone")
-    @@index([registration_status], map: "ix_registered_user_registration_status")
-    @@index([deploymentId])
-}
-
-model scan_log {
-    id                 String    @id(map: "pk_scan_log") @db.VarChar(6)
-    registered_user_id String?   @db.VarChar(6)
-    created            DateTime  @default(now()) @db.Timestamp(6)
-    updated            DateTime  @default(now()) @db.Timestamp(6)
-    zone               String    @default("ENTRY") @db.VarChar(256)
-    zoneId             String?   @db.VarChar(6)
-    notes              String?   @db.VarChar(512)
-    rating             Decimal   @default(0) @db.Decimal(2, 1)
-    scannedAt          DateTime? @default(now()) @db.Timestamp(6)
-    ZoneUser           ZoneUser? @relation(fields: [zoneId], references: [id])
-
-    @@index([zone], map: "ix_scan_log_zone")
-    @@index([zoneId], map: "ix_scan_log_zone_id")
-}
-
 model ClusterMemberMap {
     id             String      @id(map: "pk_cluster_member_map") @db.VarChar(36)
     cluster_id     String      @db.VarChar(36)
@@ -175,8 +36,8 @@ model DeploymentConcierge {
     adminId                   String?                 @db.VarChar(6)
     staffUsername             String?                 @db.VarChar(25)
     status                    ConciergeTrainingStatus @default(TRAINING)
-    cluster_admin             cluster_admin?          @relation(fields: [adminId], references: [id])
-    deployment                deployment              @relation(fields: [deploymentId], references: [id])
+    cluster_admin             ClusterAdmin?           @relation(fields: [adminId], references: [id])
+    deployment                Deployment              @relation(fields: [deploymentId], references: [id])
     DeploymentConcierge       DeploymentConcierge?    @relation("DeploymentConciergeToDeploymentConcierge", fields: [parentId], references: [id])
     other_DeploymentConcierge DeploymentConcierge[]   @relation("DeploymentConciergeToDeploymentConcierge")
     Staff                     Staff?                  @relation(fields: [staffUsername], references: [username])
@@ -190,7 +51,7 @@ model DeploymentDate {
     id           String     @id @db.VarChar(6)
     deploymentId String     @db.VarChar(6)
     date         DateTime   @db.Date
-    deployment   deployment @relation(fields: [deploymentId], references: [id])
+    deployment   Deployment @relation(fields: [deploymentId], references: [id])
 
     @@index([date, deploymentId])
 }
@@ -213,7 +74,7 @@ model LabelDeploymentMap {
     deploymentId String     @db.VarChar(6)
     labelId      String     @db.VarChar(6)
     created      DateTime   @default(now()) @db.Timestamp(6)
-    deployment   deployment @relation(fields: [deploymentId], references: [id])
+    deployment   Deployment @relation(fields: [deploymentId], references: [id])
     label        Label      @relation(fields: [labelId], references: [id])
 
     @@unique([deploymentId, labelId])
@@ -233,9 +94,9 @@ model Member {
     MemberConnection_MemberConnection_requestorIdToMember MemberConnection[]       @relation("MemberConnection_requestorIdToMember")
     MemberConnection_MemberConnection_responderIdToMember MemberConnection[]       @relation("MemberConnection_responderIdToMember")
     Persona                                               Persona[]
+    RegisteredUser                                        RegisteredUser[]
     Staff                                                 Staff[]
     journey_segment_member                                journey_segment_member[]
-    registered_user                                       registered_user[]
 
     @@index([phoneSearchVector], type: Gin)
     @@index([status, source])
@@ -268,8 +129,8 @@ model Persona {
     MemberConnection_MemberConnection_responderPersonaIdToPersona MemberConnection[]       @relation("MemberConnection_responderPersonaIdToPersona")
     label                                                         Label                    @relation(fields: [labelId], references: [id])
     Member                                                        Member                   @relation(fields: [memberId], references: [id])
+    RegisteredUser                                                RegisteredUser[]
     SurveyResponse                                                SurveyResponse[]
-    registered_user                                               registered_user[]
 
     @@unique([memberId, labelId])
     @@index([labelId])
@@ -395,16 +256,16 @@ model one_percent_registered {
 }
 
 model raw_data_info {
-    id            String        @id(map: "pk_raw_data_info") @db.VarChar(6)
-    created       DateTime      @default(now()) @db.Timestamp(6)
-    updated       DateTime      @default(now()) @db.Timestamp(6)
-    admin_id      String        @db.VarChar(6)
-    cluster_id    String        @db.VarChar(36)
-    file_name     String        @db.VarChar(512)
+    id            String       @id(map: "pk_raw_data_info") @db.VarChar(6)
+    created       DateTime     @default(now()) @db.Timestamp(6)
+    updated       DateTime     @default(now()) @db.Timestamp(6)
+    admin_id      String       @db.VarChar(6)
+    cluster_id    String       @db.VarChar(36)
+    file_name     String       @db.VarChar(512)
     record_count  Int
-    status        String        @db.VarChar(16)
-    cluster_admin cluster_admin @relation(fields: [admin_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_raw_data_info_admin_id_cluster_admin")
-    cluster       Cluster       @relation(fields: [cluster_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_raw_data_info_cluster_id_cluster")
+    status        String       @db.VarChar(16)
+    cluster_admin ClusterAdmin @relation(fields: [admin_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_raw_data_info_admin_id_cluster_admin")
+    cluster       Cluster      @relation(fields: [cluster_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_raw_data_info_cluster_id_cluster")
 
     @@index([admin_id], map: "ix_raw_data_info_admin_id")
     @@index([cluster_id], map: "ix_raw_data_info_cluster_id")
@@ -462,7 +323,7 @@ model Broadcast {
     mixpanelEventStatus    MixpanelEventStatus              @default(PENDING)
     BroadcastRecipient     BroadcastRecipient?              @relation(fields: [recipientId], references: [id])
     Survey                 Survey?                          @relation(fields: [surveyId], references: [id])
-    cluster_admin          cluster_admin?                   @relation(fields: [adminUsername], references: [phone], onDelete: NoAction, onUpdate: NoAction, map: "fk_broadcast_admin_username_cluster_admin")
+    cluster_admin          ClusterAdmin?                    @relation(fields: [adminUsername], references: [phone], onDelete: NoAction, onUpdate: NoAction, map: "fk_broadcast_admin_username_cluster_admin")
     Label                  Label                            @relation(fields: [labelId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_broadcast_label_id_label")
     Staff                  Staff?                           @relation(fields: [staffUsername], references: [username], onDelete: NoAction, onUpdate: NoAction, map: "fk_broadcast_staff_username_staff")
     BroadcastDeploymentMap BroadcastDeploymentMap[]
@@ -479,7 +340,7 @@ model BroadcastDeploymentMap {
     broadcastId  String     @db.VarChar(6)
     created      DateTime   @default(now()) @db.Timestamp(6)
     Broadcast    Broadcast  @relation(fields: [broadcastId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_broadcast_deployment_map_broadcast_id_broadcast")
-    deployment   deployment @relation(fields: [deploymentId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_broadcast_deployment_map_deployment_id_deployment")
+    deployment   Deployment @relation(fields: [deploymentId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_broadcast_deployment_map_deployment_id_deployment")
 
     @@index([broadcastId], map: "ix_broadcast_deployment_map_broadcast_id")
     @@index([deploymentId], map: "ix_broadcast_deployment_map_deployment_id")
@@ -496,7 +357,7 @@ model BroadcastRecipient {
     deploymentId String?                  @db.VarChar(6)
     Broadcast    Broadcast[]
     Cluster      Cluster?                 @relation(fields: [clusterId], references: [id])
-    deployment   deployment?              @relation(fields: [deploymentId], references: [id])
+    deployment   Deployment?              @relation(fields: [deploymentId], references: [id])
 }
 
 model BroadcastTarget {
@@ -516,12 +377,12 @@ model BroadcastTarget {
 }
 
 model CADeploymentMap {
-    id            String        @id(map: "pk_ca_deployment_map") @db.VarChar(6)
-    adminId       String        @db.VarChar(6)
-    deploymentId  String        @db.VarChar(6)
-    created       DateTime      @default(now()) @db.Timestamp(6)
-    cluster_admin cluster_admin @relation(fields: [adminId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_ca_deployment_map_admin_id_cluster_admin")
-    deployment    deployment    @relation(fields: [deploymentId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_ca_deployment_map_deployment_id_deployment")
+    id            String       @id(map: "pk_ca_deployment_map") @db.VarChar(6)
+    adminId       String       @db.VarChar(6)
+    deploymentId  String       @db.VarChar(6)
+    created       DateTime     @default(now()) @db.Timestamp(6)
+    cluster_admin ClusterAdmin @relation(fields: [adminId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_ca_deployment_map_admin_id_cluster_admin")
+    deployment    Deployment   @relation(fields: [deploymentId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_ca_deployment_map_deployment_id_deployment")
 }
 
 model Cluster {
@@ -537,12 +398,12 @@ model Cluster {
     ClusterAccess_ClusterAccess_fromClusterIdToCluster            ClusterAccess[]           @relation("ClusterAccess_fromClusterIdToCluster")
     ClusterAccess_ClusterAccess_toClusterIdToCluster              ClusterAccess[]           @relation("ClusterAccess_toClusterIdToCluster")
     ClusterConfig                                                 ClusterConfig?
+    ClusterDeploymentMap                                          ClusterDeploymentMap[]
     ClusterMemberMap                                              ClusterMemberMap[]
     DiscoveryFile                                                 DiscoveryFile[]
     Keyword                                                       Keyword[]
     MemberConnection_MemberConnection_requestorClusterIdToCluster MemberConnection[]        @relation("MemberConnection_requestorClusterIdToCluster")
     MemberConnection_MemberConnection_responderClusterIdToCluster MemberConnection[]        @relation("MemberConnection_responderClusterIdToCluster")
-    cluster_deployment_map                                        cluster_deployment_map[]
     journey_segment_cluster                                       journey_segment_cluster[]
     raw_data_info                                                 raw_data_info[]
 }
@@ -709,7 +570,7 @@ model DeploymentEmail {
     userType     String?    @db.VarChar(32)
     subject      String     @default("APPROVED: Your registration for {{title}}")
     fromEmail    String     @default("hello@introbot.ai") @db.VarChar(128)
-    deployment   deployment @relation(fields: [deploymentId], references: [id])
+    deployment   Deployment @relation(fields: [deploymentId], references: [id])
 
     @@index([deploymentId])
 }
@@ -747,7 +608,7 @@ model Email {
     fromName       String           @db.VarChar(128)
     template       String
     deploymentId   String?          @db.VarChar(6)
-    deployment     deployment?      @relation(fields: [deploymentId], references: [id])
+    deployment     Deployment?      @relation(fields: [deploymentId], references: [id])
     EmailRecipient EmailRecipient[]
 
     @@index([createdAt])
@@ -788,7 +649,7 @@ model GBBAM {
     type         GBBAMType
     arbitrary    Json         @default("{}")
     deploymentId String       @db.VarChar(6)
-    deployment   deployment   @relation(fields: [deploymentId], references: [id])
+    deployment   Deployment   @relation(fields: [deploymentId], references: [id])
     GBBMeeting   GBBMeeting[]
     GBBUser      GBBUser[]
 }
@@ -800,7 +661,7 @@ model GBBCompanyInfo {
     arbitrary         Json                @default("{}")
     comments          String?
     deploymentId      String              @db.VarChar(6)
-    deployment        deployment          @relation(fields: [deploymentId], references: [id])
+    deployment        Deployment          @relation(fields: [deploymentId], references: [id])
     GBBEmptyMeeting   GBBEmptyMeeting[]
     GBBUser           GBBUser[]
     GBBUserCompanyMap GBBUserCompanyMap[]
@@ -815,7 +676,7 @@ model GBBConfig {
     createdAt           DateTime   @default(now()) @db.Timestamp(6)
     updatedAt           DateTime   @default(now()) @db.Timestamp(6)
     scannerPageListKeys Json       @default("[]")
-    deployment          deployment @relation(fields: [deploymentId], references: [id])
+    deployment          Deployment @relation(fields: [deploymentId], references: [id])
 
     @@index([deploymentId])
 }
@@ -829,7 +690,7 @@ model GBBEmptyMeeting {
     updatedAt      DateTime       @default(now()) @db.Timestamp(6)
     order          Int            @default(0)
     GBBCompanyInfo GBBCompanyInfo @relation(fields: [companyId], references: [id])
-    deployment     deployment     @relation(fields: [deploymentId], references: [id])
+    deployment     Deployment     @relation(fields: [deploymentId], references: [id])
 
     @@index([companyId])
     @@index([deploymentId])
@@ -851,7 +712,7 @@ model GBBMeeting {
     deploymentId             String                     @db.VarChar(6)
     meetingTime              DateTime?                  @db.Timestamp(6)
     nextMeetingsInBlocks     Int?                       @default(0)
-    deployment               deployment                 @relation(fields: [deploymentId], references: [id])
+    deployment               Deployment                 @relation(fields: [deploymentId], references: [id])
     GBBAM                    GBBAM?                     @relation(fields: [lastUpdatedByAMId], references: [id])
     GBBTable                 GBBTable?                  @relation(fields: [tableId], references: [id])
     GBBMeetingParticipantMap GBBMeetingParticipantMap[]
@@ -877,7 +738,7 @@ model GBBTable {
     arbitrary    Json         @default("{}")
     deploymentId String       @db.VarChar(6)
     GBBMeeting   GBBMeeting[]
-    deployment   deployment   @relation(fields: [deploymentId], references: [id])
+    deployment   Deployment   @relation(fields: [deploymentId], references: [id])
 }
 
 model GBBUser {
@@ -890,7 +751,7 @@ model GBBUser {
     GBBMeetingParticipantMap GBBMeetingParticipantMap[]
     GBBAM                    GBBAM                      @relation(fields: [amId], references: [id])
     GBBCompanyInfo           GBBCompanyInfo             @relation(fields: [companyId], references: [id])
-    registered_user          registered_user            @relation(fields: [registeredUserId], references: [id])
+    registered_user          RegisteredUser             @relation(fields: [registeredUserId], references: [id])
     GBBUserCompanyMap        GBBUserCompanyMap[]
 
     @@index([companyId])
@@ -956,28 +817,29 @@ model Interaction {
 }
 
 model Label {
-    id                      String                  @id(map: "pk_label") @db.VarChar(6)
-    created                 DateTime                @default(now()) @db.Timestamp(6)
-    updated                 DateTime                @default(now()) @db.Timestamp(6)
-    displayName             String                  @db.VarChar(128)
-    phone                   String                  @db.VarChar(16)
-    endpoint                String                  @db.VarChar(1024)
-    credentials             String?                 @db.VarChar(1024)
-    authLogic               String                  @db.VarChar(128)
-    namespace               String                  @db.VarChar(36)
-    apiType                 String                  @default("on_premise") @db.VarChar(16)
-    enabled                 Boolean                 @default(true)
-    website                 String?
-    whatsappAccountId       String                  @db.VarChar(16)
-    baseTemplates           Json                    @default("{}")
-    inviteCodeRegretMessage String                  @default("I'm so sorry! I wasn't able to recognize the invite code.\n\nCould you please check with the person who shared it with you? Apologies for the inconvenience!") @db.VarChar(512)
-    Broadcast               Broadcast[]
-    Cluster                 Cluster[]
-    LabelDeploymentMap      LabelDeploymentMap[]
-    Persona                 Persona[]
-    WhatsAppFlow            WhatsAppFlow[]
-    WhatsAppTemplate        WhatsAppTemplate[]
-    journey_segment_label   journey_segment_label[]
+    id                         String                       @id(map: "pk_label") @db.VarChar(6)
+    created                    DateTime                     @default(now()) @db.Timestamp(6)
+    updated                    DateTime                     @default(now()) @db.Timestamp(6)
+    displayName                String                       @db.VarChar(128)
+    phone                      String                       @db.VarChar(16)
+    endpoint                   String                       @db.VarChar(1024)
+    credentials                String?                      @db.VarChar(1024)
+    authLogic                  String                       @db.VarChar(128)
+    namespace                  String                       @db.VarChar(36)
+    apiType                    String                       @default("on_premise") @db.VarChar(16)
+    enabled                    Boolean                      @default(true)
+    website                    String?
+    whatsappAccountId          String                       @db.VarChar(16)
+    baseTemplates              Json                         @default("{}")
+    inviteCodeRegretMessage    String                       @default("I'm so sorry! I wasn't able to recognize the invite code.\n\nCould you please check with the person who shared it with you? Apologies for the inconvenience!") @db.VarChar(512)
+    Broadcast                  Broadcast[]
+    Cluster                    Cluster[]
+    DeploymentWhatsAppTemplate DeploymentWhatsAppTemplate[]
+    LabelDeploymentMap         LabelDeploymentMap[]
+    Persona                    Persona[]
+    WhatsAppFlow               WhatsAppFlow[]
+    WhatsAppTemplate           WhatsAppTemplate[]
+    journey_segment_label      journey_segment_label[]
 
     @@index([phone, enabled])
 }
@@ -1036,15 +898,15 @@ model MessageDeliveryPayload {
 }
 
 model Notification {
-    id            String         @id(map: "pk_notification") @db.VarChar(6)
-    created       DateTime       @default(now()) @db.Timestamp(6)
-    updated       DateTime       @default(now()) @db.Timestamp(6)
-    title         String         @db.VarChar(512)
-    message       String         @db.VarChar(1024)
-    link          String?        @db.VarChar(1024)
-    isRead        Boolean        @default(false)
-    adminId       String?        @db.VarChar(6)
-    cluster_admin cluster_admin? @relation(fields: [adminId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_admin_id_cluster_admin")
+    id            String        @id(map: "pk_notification") @db.VarChar(6)
+    created       DateTime      @default(now()) @db.Timestamp(6)
+    updated       DateTime      @default(now()) @db.Timestamp(6)
+    title         String        @db.VarChar(512)
+    message       String        @db.VarChar(1024)
+    link          String?       @db.VarChar(1024)
+    isRead        Boolean       @default(false)
+    adminId       String?       @db.VarChar(6)
+    cluster_admin ClusterAdmin? @relation(fields: [adminId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_admin_id_cluster_admin")
 }
 
 model Survey {
@@ -1074,7 +936,7 @@ model SurveyDeploymentMap {
     createdAt    DateTime   @default(now())
     surveyId     String     @db.VarChar(6)
     deploymentId String     @db.VarChar(6)
-    deployment   deployment @relation(fields: [deploymentId], references: [id])
+    deployment   Deployment @relation(fields: [deploymentId], references: [id])
     Survey       Survey     @relation(fields: [surveyId], references: [id])
 }
 
@@ -1135,22 +997,21 @@ model WhatsAppFlow {
 }
 
 model WhatsAppTemplate {
-    id                                                            String                          @id @db.VarChar(6)
-    name                                                          String                          @db.VarChar(512)
-    labelId                                                       String                          @db.VarChar(6)
-    createdAt                                                     DateTime                        @default(now()) @db.Timestamp(6)
-    category                                                      WhatsAppTemplateCategory
-    components                                                    Json                            @default("[]")
-    metaTemplateId                                                String                          @db.VarChar(20)
-    metaLanguageCode                                              String                          @db.VarChar(10)
-    metaParameterFormat                                           WhatsAppTemplateParameterFormat
-    metaSubCategory                                               String                          @db.VarChar(100)
-    status                                                        WhatsAppTemplateStatus
-    lastMetaSyncAt                                                DateTime                        @default(now()) @db.Timestamp(6)
-    eval                                                          Json                            @default("[]")
-    Label                                                         Label                           @relation(fields: [labelId], references: [id])
-    deployment_deployment_zoneReportTemplateIdToWhatsAppTemplate  deployment[]                    @relation("deployment_zoneReportTemplateIdToWhatsAppTemplate")
-    deployment_deployment_zoneScannerTemplateIdToWhatsAppTemplate deployment[]                    @relation("deployment_zoneScannerTemplateIdToWhatsAppTemplate")
+    id                         String                          @id @db.VarChar(6)
+    name                       String                          @db.VarChar(512)
+    labelId                    String                          @db.VarChar(6)
+    createdAt                  DateTime                        @default(now()) @db.Timestamp(6)
+    category                   WhatsAppTemplateCategory
+    components                 Json                            @default("[]")
+    metaTemplateId             String                          @db.VarChar(20)
+    metaLanguageCode           String                          @db.VarChar(10)
+    metaParameterFormat        WhatsAppTemplateParameterFormat
+    metaSubCategory            String                          @db.VarChar(100)
+    status                     WhatsAppTemplateStatus
+    lastMetaSyncAt             DateTime                        @default(now()) @db.Timestamp(6)
+    eval                       Json                            @default("[]")
+    DeploymentWhatsAppTemplate DeploymentWhatsAppTemplate[]
+    Label                      Label                           @relation(fields: [labelId], references: [id])
 
     @@unique([metaTemplateId, labelId, metaLanguageCode])
     @@unique([name, labelId, metaLanguageCode])
@@ -1165,7 +1026,7 @@ model ZoneGroup {
     deploymentId    String      @db.VarChar(6)
     createdAt       DateTime    @default(now())
     updatedAt       DateTime
-    deployment      deployment  @relation(fields: [deploymentId], references: [id])
+    deployment      Deployment  @relation(fields: [deploymentId], references: [id])
     ZoneGroup       ZoneGroup?  @relation("ZoneGroupToZoneGroup", fields: [subGroupId], references: [id])
     other_ZoneGroup ZoneGroup[] @relation("ZoneGroupToZoneGroup")
     ZoneUser        ZoneUser[]
@@ -1181,12 +1042,275 @@ model ZoneUser {
     showDetailsInScanner Boolean    @default(true)
     zoneGroupId          String?    @db.VarChar(6)
     scanDuplicate        Boolean    @default(false)
-    deployment           deployment @relation(fields: [deploymentId], references: [id])
+    ScanLog              ScanLog[]
+    deployment           Deployment @relation(fields: [deploymentId], references: [id])
     ZoneGroup            ZoneGroup? @relation(fields: [zoneGroupId], references: [id])
-    scan_log             scan_log[]
 
     @@index([deploymentId])
     @@index([deploymentId], map: "Zone_deploymentId_idx")
+}
+
+model ClusterAdmin {
+    id                        String                @id(map: "pk_cluster_admin") @db.VarChar(6)
+    phone                     String                @unique(map: "ix_cluster_admin_phone") @db.VarChar(16)
+    created                   DateTime              @default(now()) @db.Timestamp(6)
+    updated                   DateTime              @default(now()) @db.Timestamp(6)
+    display_name              String                @db.VarChar(128)
+    mixpanel_analytics        String?               @db.VarChar(1024)
+    feature_flags             String                @default("[]") @db.VarChar(1024)
+    invitee_approved_template String?               @db.VarChar(1024)
+    event_key                 String?               @db.VarChar(1024)
+    api_key                   String?               @db.VarChar(1024)
+    businessAddress           String?               @db.VarChar(256)
+    businessEmail             String?               @db.VarChar(128)
+    businessName              String?               @db.VarChar(128)
+    businessType              String?               @db.VarChar(128)
+    country                   String?               @db.VarChar(128)
+    industry                  String?               @db.VarChar(128)
+    teamSize                  String?               @db.VarChar(128)
+    website                   String?               @db.VarChar(128)
+    Broadcast                 Broadcast[]
+    CADeploymentMap           CADeploymentMap[]
+    DeploymentConcierge       DeploymentConcierge[]
+    Notification              Notification[]
+    raw_data_info             raw_data_info[]
+}
+
+model ClusterDeploymentMap {
+    id            String     @id(map: "pk_cluster_deployment_map") @db.VarChar(36)
+    cluster_id    String     @db.VarChar(36)
+    deployment_id String     @db.VarChar(6)
+    created       DateTime   @default(now()) @db.Timestamp(6)
+    Cluster       Cluster    @relation(fields: [cluster_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_cluster_deployment_map_cluster_id_cluster")
+    Deployment    Deployment @relation(fields: [deployment_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_cluster_deployment_map_deployment_id_deployment")
+}
+
+model Deployment {
+    id                          String                        @id(map: "pk_deployment") @db.VarChar(6)
+    config                      String
+    createdAt                   DateTime                      @default(now()) @db.Timestamp(6)
+    updatedAt                   DateTime                      @default(now()) @db.Timestamp(6)
+    title                       String                        @default("New Event") @db.VarChar(255)
+    logoUrl                     String?
+    mapUrl                      String?
+    place                       String?                       @db.VarChar(512)
+    time                        String?                       @db.VarChar(512)
+    type                        String                        @default("Event") @db.VarChar(512)
+    BroadcastDeploymentMap      BroadcastDeploymentMap[]
+    BroadcastRecipient          BroadcastRecipient[]
+    CADeploymentMap             CADeploymentMap[]
+    ClusterDeploymentMap        ClusterDeploymentMap[]
+    DeploymentAPIKey            DeploymentAPIKey[]
+    DeploymentConcierge         DeploymentConcierge[]
+    DeploymentConfig            DeploymentConfig?
+    DeploymentDate              DeploymentDate[]
+    DeploymentEmail             DeploymentEmail[]
+    DeploymentWhatsAppTemplate  DeploymentWhatsAppTemplate[]
+    Email                       Email[]
+    GBBAM                       GBBAM[]
+    GBBCompanyInfo              GBBCompanyInfo[]
+    GBBConfig                   GBBConfig[]
+    GBBEmptyMeeting             GBBEmptyMeeting[]
+    GBBMeeting                  GBBMeeting[]
+    GBBTable                    GBBTable[]
+    GroupCheckInCondition       GroupCheckInCondition[]
+    LabelDeploymentMap          LabelDeploymentMap[]
+    LeadScannerKey              LeadScannerKey[]
+    RegisteredUser              RegisteredUser[]
+    RegistrationBadgeCardKey    RegistrationBadgeCardKey[]
+    RegistrationPostScanPageKey RegistrationPostScanPageKey[]
+    RegistrationTableKey        RegistrationTableKey[]
+    RegistrationTallyMapping    RegistrationTallyMapping[]
+    SurveyDeploymentMap         SurveyDeploymentMap[]
+    ZoneGroup                   ZoneGroup[]
+    ZoneUser                    ZoneUser[]
+}
+
+model DeploymentAPIKey {
+    id           String                  @id @db.VarChar(6)
+    createdAt    DateTime                @default(now()) @db.Timestamp(6)
+    generatedAt  DateTime                @default(now()) @db.Timestamp(6)
+    expiresAt    DateTime?               @db.Timestamp(6)
+    apiKey       String                  @unique @db.VarChar(128)
+    purpose      DeploymentAPIKeyPurpose
+    comments     String?                 @db.VarChar(512)
+    deploymentId String                  @db.VarChar(6)
+    Deployment   Deployment              @relation(fields: [deploymentId], references: [id])
+
+    @@index([deploymentId, purpose])
+}
+
+model DeploymentConfig {
+    id                          String     @id @db.VarChar(6)
+    deploymentId                String     @unique @db.VarChar(6)
+    createdAt                   DateTime   @default(now()) @db.Timestamp(6)
+    updatedAt                   DateTime   @default(now()) @db.Timestamp(6)
+    defaultUserType             String     @default("ATTENDEE") @db.VarChar(128)
+    themeColor                  String     @default("000000") @db.VarChar(10)
+    sendAllCount                Int        @default(0)
+    sendAllLimit                Int        @default(3)
+    onboardingFinished          Boolean    @default(false)
+    onboardingMeetingLink       String?
+    onboardingMeetingTime       DateTime?  @db.Timestamp(6)
+    novaEBadge                  Boolean    @default(false)
+    scanPageHandlebars          String?
+    conciergeEnabled            Boolean    @default(false)
+    conciergeFineTunes          Json       @default("[]")
+    conciergeResponseGuidelines Json       @default("[]")
+    allowPartnerScanDelete      Boolean    @default(false)
+    allowPartnerScanDownload    Boolean    @default(true)
+    isApprovalRequired          Boolean    @default(false)
+    Deployment                  Deployment @relation(fields: [deploymentId], references: [id])
+
+    @@index([deploymentId])
+}
+
+model DeploymentWhatsAppTemplate {
+    id               String                            @id @db.VarChar(6)
+    deploymentId     String                            @db.VarChar(6)
+    labelId          String                            @db.VarChar(6)
+    templateId       String                            @db.VarChar(6)
+    variables        Json                              @default("[]")
+    purpose          DeploymentWhatsAppTemplatePurpose
+    createdAt        DateTime                          @default(now()) @db.Timestamp(6)
+    updatedAt        DateTime                          @default(now()) @db.Timestamp(6)
+    Deployment       Deployment                        @relation(fields: [deploymentId], references: [id])
+    Label            Label                             @relation(fields: [labelId], references: [id])
+    WhatsAppTemplate WhatsAppTemplate                  @relation(fields: [templateId], references: [id])
+
+    @@index([deploymentId])
+    @@index([labelId])
+}
+
+model GroupCheckInCondition {
+    id             String     @id @db.VarChar(6)
+    deploymentId   String     @db.VarChar(6)
+    enabled        Boolean    @default(true)
+    conditionKey   String     @db.VarChar(128)
+    conditionValue String     @db.VarChar(512)
+    createdAt      DateTime   @default(now()) @db.Timestamp(6)
+    updatedAt      DateTime   @default(now()) @db.Timestamp(6)
+    Deployment     Deployment @relation(fields: [deploymentId], references: [id])
+
+    @@index([deploymentId])
+}
+
+model LeadScannerKey {
+    id           String     @id @db.VarChar(6)
+    deploymentId String     @db.VarChar(6)
+    keyName      String     @db.VarChar(128)
+    name         String     @db.VarChar(128)
+    icon         String     @db.VarChar(128)
+    break        Boolean    @default(false)
+    createdAt    DateTime   @default(now()) @db.Timestamp(6)
+    updatedAt    DateTime   @default(now()) @db.Timestamp(6)
+    Deployment   Deployment @relation(fields: [deploymentId], references: [id])
+
+    @@index([deploymentId])
+}
+
+model RegisteredUser {
+    id                  String      @id(map: "pk_registered_user") @db.VarChar(6)
+    phone               String?     @db.VarChar(16)
+    name                String?     @db.VarChar(128)
+    email               String?     @db.VarChar(128)
+    meta_data           Json        @default("{}")
+    created             DateTime    @default(now()) @db.Timestamp(6)
+    updated             DateTime    @default(now()) @db.Timestamp(6)
+    user_type           String?     @db.VarChar(32)
+    registration_status String      @default("CREATED") @db.VarChar(16)
+    tally_id            String?     @db.VarChar(32)
+    linkedin            String?     @db.VarChar(1024)
+    extra               String      @default("{}")
+    checked_in          Boolean?    @default(false)
+    memberId            String?     @db.VarChar(36)
+    personaId           String?     @db.VarChar(6)
+    deleted             Boolean?    @default(false)
+    vendorId            String?     @unique @db.VarChar(32)
+    scanCondition       Json        @default("{}")
+    offlineId           String?     @db.VarChar(32)
+    deploymentId        String?     @db.VarChar(6)
+    GBBUser             GBBUser[]
+    Deployment          Deployment? @relation(fields: [deploymentId], references: [id])
+    Member              Member?     @relation(fields: [memberId], references: [id])
+    Persona             Persona?    @relation(fields: [personaId], references: [id])
+
+    @@index([deploymentId])
+    @@index([checked_in], map: "ix_registered_user_checked_in")
+    @@index([email], map: "ix_registered_user_email")
+    @@index([name], map: "ix_registered_user_name")
+    @@index([phone], map: "ix_registered_user_phone")
+    @@index([registration_status], map: "ix_registered_user_registration_status")
+}
+
+model RegistrationBadgeCardKey {
+    id           String     @id @db.VarChar(6)
+    deploymentId String     @db.VarChar(6)
+    keyName      String     @db.VarChar(128)
+    name         String     @db.VarChar(128)
+    icon         String     @db.VarChar(128)
+    break        Boolean    @default(false)
+    createdAt    DateTime   @default(now()) @db.Timestamp(6)
+    updatedAt    DateTime   @default(now()) @db.Timestamp(6)
+    Deployment   Deployment @relation(fields: [deploymentId], references: [id])
+
+    @@index([deploymentId])
+}
+
+model RegistrationPostScanPageKey {
+    id           String                              @id @db.VarChar(6)
+    deploymentId String                              @db.VarChar(6)
+    keyName      String                              @db.VarChar(128)
+    dataType     RegistrationPostScanPageKeyDataType
+    createdAt    DateTime                            @default(now()) @db.Timestamp(6)
+    updatedAt    DateTime                            @default(now()) @db.Timestamp(6)
+    Deployment   Deployment                          @relation(fields: [deploymentId], references: [id])
+
+    @@index([deploymentId])
+}
+
+model RegistrationTableKey {
+    id           String                  @id @db.VarChar(6)
+    deploymentId String                  @db.VarChar(6)
+    keyName      String                  @db.VarChar(128)
+    dataType     RegistrationKeyDataType
+    isSortable   Boolean                 @default(false)
+    width        Int                     @default(250)
+    createdAt    DateTime                @default(now()) @db.Timestamp(6)
+    updatedAt    DateTime                @default(now()) @db.Timestamp(6)
+    Deployment   Deployment              @relation(fields: [deploymentId], references: [id])
+
+    @@index([deploymentId])
+}
+
+model RegistrationTallyMapping {
+    id           String     @id @db.VarChar(6)
+    deploymentId String     @db.VarChar(6)
+    questionId   String     @db.VarChar(128)
+    keyName      String     @db.VarChar(128)
+    order        Int        @default(1)
+    separator    String?    @db.VarChar(16)
+    createdAt    DateTime   @default(now()) @db.Timestamp(6)
+    updatedAt    DateTime   @default(now()) @db.Timestamp(6)
+    Deployment   Deployment @relation(fields: [deploymentId], references: [id])
+
+    @@index([deploymentId])
+}
+
+model ScanLog {
+    id                 String    @id(map: "pk_scan_log") @db.VarChar(6)
+    registered_user_id String?   @db.VarChar(6)
+    created            DateTime  @default(now()) @db.Timestamp(6)
+    updated            DateTime  @default(now()) @db.Timestamp(6)
+    zone               String    @default("ENTRY") @db.VarChar(256)
+    zoneId             String?   @db.VarChar(6)
+    notes              String?   @db.VarChar(512)
+    rating             Decimal   @default(0) @db.Decimal(2, 1)
+    scannedAt          DateTime? @default(now()) @db.Timestamp(6)
+    ZoneUser           ZoneUser? @relation(fields: [zoneId], references: [id])
+
+    @@index([zone], map: "ix_scan_log_zone")
+    @@index([zoneId], map: "ix_scan_log_zone_id")
 }
 
 enum NumberStatus {
@@ -1325,4 +1449,32 @@ enum WhatsAppTemplateStatus {
     PENDING
     APPROVED
     REJECTED
+}
+
+enum DeploymentAPIKeyPurpose {
+    DEPLOYMENT
+}
+
+enum DeploymentWhatsAppTemplatePurpose {
+    ZONE_SCANNER
+    ZONE_REPORT
+    ENTRY_QR
+}
+
+enum RegistrationKeyDataType {
+    STRING
+    PHONE
+    LINK
+    CHIP_DARK
+    CHECKED_IN
+    BOOLEAN
+    TIME
+}
+
+enum RegistrationPostScanPageKeyDataType {
+    STRING
+    BOOLEAN
+    LINK
+    PHONE
+    TIME
 }
