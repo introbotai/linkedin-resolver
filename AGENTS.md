@@ -9,9 +9,14 @@ You are an AI assistant helping with code development. Follow these rules strict
 - Example: `user-profile.ts`, `api-handler.ts`, `data-processor.ts`
 - NEVER use camelCase, PascalCase, or snake_case for file names
 
-### Rule 2: File Header Comment
-Every file MUST start with this exact header format, followed by ONE blank line:
+### Rule 2: File Header and Directives
+Every file MUST start with a file header comment.
+**Exception**: If the file requires a directive like `'use client'` or `'use server'`, this directive MUST appear on the very first line, BEFORE the file header comment.
+
+Format:
 ```
+['use client' / 'use server' if applicable]
+
 /*
  *  [Single line description of file purpose]
  *  Created On [DD] [Full Month Name] [YYYY]
@@ -21,7 +26,7 @@ Every file MUST start with this exact header format, followed by ONE blank line:
 [code starts here]
 ```
 
-Example:
+Example (Standard):
 ```
 /*
  *  Handles user authentication and session management
@@ -29,6 +34,18 @@ Example:
  */
 
 export const authenticateUser = async () => {
+```
+
+Example (With Directive):
+```
+'use client'
+
+/*
+ *  Client-side dashboard component
+ *  Created On 15 March 2024
+ */
+
+export function Dashboard() {
 ```
 
 ### Rule 3: File Size Limit
@@ -153,7 +170,7 @@ To fix code style issues:
 
 Before completing each task, verify:
 - [ ] File name uses dash-case
-- [ ] File header comment is present with correct format
+- [ ] File header comment is present (after directive if applicable)
 - [ ] One blank line after file header
 - [ ] All other comments are lowercase
 - [ ] No file exceeds 300 lines
