@@ -166,6 +166,16 @@ To fix code style issues:
 2. This automatically fixes formatting issues
 3. Do NOT manually fix linting errors - use the command
 
+### Rule 13: TypeScript Strictness
+- NEVER use `// @ts-ignore`, `// @ts-expect-error`, or `// @ts-nocheck`
+- ALWAYS write full, proper TypeScript code with correct types and interfaces
+- If you encounter a type error, resolve it by:
+  1. Fixing the underlying type mismatch
+  2. Defining missing interfaces/types
+  3. Using type narrowing (e.g., `typeof`, `instanceof`, or custom type guards)
+  4. Using `unknown` instead of `any` when the type is unknown
+- Do NOT use `any` unless there is no other way to represent the type
+
 ## Compliance Checklist
 
 Before completing each task, verify:
@@ -178,7 +188,7 @@ Before completing each task, verify:
 - [ ] Using async/await (not callbacks/promises)
 - [ ] Using named exports at definition
 - [ ] No try/catch unless requested
-- [ ] `bun run type-check` passes with zero errors
+- [ ] `bun run type-check` passes with zero errors (no `@ts-ignore`)
 - [ ] `bun run lint` has been executed
 
 ## Summary
