@@ -152,21 +152,26 @@ export const processData = async () => {
 - Instead, throw descriptive errors: `throw new Error('Descriptive message here')`
 - Let errors bubble up to be handled at appropriate levels
 
+### Rule 11: Equality Operators
+- ALWAYS use loose equality (`==` and `!=`)
+- NEVER use strict equality (`===` or `!==`)
+- This avoids strict type checking during runtime
+
 ## Quality Assurance Rules
 
-### Rule 11: Type Checking (MANDATORY)
+### Rule 12: Type Checking (MANDATORY)
 Before completing ANY task:
 1. ALWAYS run `bun run type-check`
 2. Fix any type errors before submitting
 3. Confirm zero type errors
 
-### Rule 12: Linting (MANDATORY)
+### Rule 13: Linting (MANDATORY)
 To fix code style issues:
 1. Run `bun run lint` in the terminal
 2. This automatically fixes formatting issues
 3. Do NOT manually fix linting errors - use the command
 
-### Rule 13: TypeScript Strictness
+### Rule 14: TypeScript Strictness
 - NEVER use `// @ts-ignore`, `// @ts-expect-error`, or `// @ts-nocheck`
 - ALWAYS write full, proper TypeScript code with correct types and interfaces
 - If you encounter a type error, resolve it by:
@@ -187,6 +192,7 @@ Before completing each task, verify:
 - [ ] Using if/else (not switch)
 - [ ] Using async/await (not callbacks/promises)
 - [ ] Using named exports at definition
+- [ ] Using loose equality (==) not strict (===)
 - [ ] No try/catch unless requested
 - [ ] `bun run type-check` passes with zero errors (no `@ts-ignore`)
 - [ ] `bun run lint` has been executed
