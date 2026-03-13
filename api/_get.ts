@@ -56,19 +56,25 @@ async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(404).send(`${persona.name} hasn't provided a LinkedIn`)
     }
 
+    // ensure we only have one https:// prefix and handle potential query parameters
+    // that might have been broken by manual encoding in the previous version.
+    // we use the URL constructor to handle encoding of the path correctly
+    // while preserving query parameters.
+    const cleanUrl = (persona.linkedin || '').trim().replace(/^(https?:\/\/)+/i, '')
+    const target = new URL(`https://${cleanUrl}`).toString()
+
     // fire the required Mixpanel events
-    await mixpanel.track.setProfile({ name: persona.name, id: persona.memberId, phone: persona.phone })
+    await mixpanel.track.setProfile({ 
+        name: persona.name ?? undefined, 
+        id: persona.memberId ?? undefined, 
+        phone: persona.phone ?? undefined, 
+    })
     await mixpanel.track.linkedInClicked({
+        target,
         pathName: id,
         id: persona.memberId,
-        target: persona.linkedin,
     })
 
-    // url encode the username because people have weird characters
-    // in their usernames 🙄
-    const linkedinUsername = encodeURIComponent(persona.linkedin.split('/').pop())
-    const hostname = persona.linkedin.split('/').toSpliced(-1, 1)
-    const target = `https://${hostname.join('/')}/${linkedinUsername}`
     res.setHeader('Location', target)
 
     console.log(`Redirecting to: ${target}`)
