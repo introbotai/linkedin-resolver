@@ -57,7 +57,7 @@ async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // fire the required Mixpanel events
-    await mixpanel.track.setProfile({ name: persona.name, id: persona.memberId, phone: persona.phone })
+    await mixpanel.track.setProfile({ name: persona.name ?? undefined, id: persona.memberId ?? undefined, phone: persona.phone ?? undefined })
     await mixpanel.track.linkedInClicked({
         pathName: id,
         id: persona.memberId,
@@ -66,9 +66,11 @@ async function handler(req: VercelRequest, res: VercelResponse) {
 
     // url encode the username because people have weird characters
     // in their usernames 🙄
-    const linkedinUsername = encodeURIComponent(persona.linkedin.split('/').pop())
-    const hostname = persona.linkedin.split('/').toSpliced(-1, 1)
-    const target = `https://${hostname.join('/')}/${linkedinUsername}`
+    const linkedinUrl = persona.linkedin.replace(/^https?:\/\//, '')
+    const parts = linkedinUrl.split('/')
+    const linkedinUsername = encodeURIComponent(parts.pop() || '')
+    const base = parts.join('/')
+    const target = `https://${base}/${linkedinUsername}`
     res.setHeader('Location', target)
 
     console.log(`Redirecting to: ${target}`)
