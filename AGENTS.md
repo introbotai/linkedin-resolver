@@ -157,21 +157,25 @@ export const processData = async () => {
 - NEVER use strict equality (`===` or `!==`)
 - This avoids strict type checking during runtime
 
+### Rule 12: Iteration
+- ALWAYS use `for (const ... of ...)` or `for (const ... in ...)` for loops
+- NEVER use `Array.prototype.forEach()`
+
 ## Quality Assurance Rules
 
-### Rule 12: Type Checking (MANDATORY)
+### Rule 13: Type Checking (MANDATORY)
 Before completing ANY task:
 1. ALWAYS run `bun run type-check`
 2. Fix any type errors before submitting
 3. Confirm zero type errors
 
-### Rule 13: Linting (MANDATORY)
+### Rule 14: Linting (MANDATORY)
 To fix code style issues:
 1. Run `bun run lint` in the terminal
 2. This automatically fixes formatting issues
 3. Do NOT manually fix linting errors - use the command
 
-### Rule 14: TypeScript Strictness
+### Rule 15: TypeScript Strictness
 - NEVER use `// @ts-ignore`, `// @ts-expect-error`, or `// @ts-nocheck`
 - ALWAYS write full, proper TypeScript code with correct types and interfaces
 - If you encounter a type error, resolve it by:
@@ -193,6 +197,7 @@ Before completing each task, verify:
 - [ ] Using async/await (not callbacks/promises)
 - [ ] Using named exports at definition
 - [ ] Using loose equality (==) not strict (===)
+- [ ] Using for (const ... of/in) instead of .forEach()
 - [ ] No try/catch unless requested
 - [ ] `bun run type-check` passes with zero errors (no `@ts-ignore`)
 - [ ] `bun run lint` has been executed
